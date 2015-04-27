@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>preferencias</class>
+ <widget class="QDialog" name="preferencias">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>431</width>
+    <height>327</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Preferencias</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="parametersBox">
+     <property name="title">
+      <string>Parámetros de comunicación</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="baudRateLabel">
+        <property name="text">
+         <string>Bauds:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="baudRateBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="dataBitsLabel">
+        <property name="text">
+         <string>Bits de dato:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="dataBitsBox"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="parityLabel">
+        <property name="text">
+         <string>Paridad:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="parityBox"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="stopBitsLabel">
+        <property name="text">
+         <string>Bits finales:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="stopBitsBox"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="flowControlLabel">
+        <property name="text">
+         <string>Control flujo:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="flowControlBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="selectBox">
+     <property name="title">
+      <string>Seleccionar puerto serial</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="serialPortInfoListBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="descriptionLabel">
+        <property name="text">
+         <string>Descripción:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="manufacturerLabel">
+        <property name="text">
+         <string>Fabricante:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="serialNumberLabel">
+        <property name="text">
+         <string>Número serial:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="locationLabel">
+        <property name="text">
+         <string>Localización:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="vidLabel">
+        <property name="text">
+         <string>ID vendedor:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="pidLabel">
+        <property name="text">
+         <string>ID producto:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>96</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="applyButton">
+       <property name="text">
+        <string>Aceptar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="robot_options">
+     <property name="title">
+      <string>Opciones de robot</string>
+     </property>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>181</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Comportamiento por defecto:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="behaviorList">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>30</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

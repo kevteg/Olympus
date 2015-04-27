@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>olymain</class>
+ <widget class="QMainWindow" name="olymain">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1373</width>
+    <height>737</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Olympus</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QGroupBox" name="controls_container">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>1371</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>50</horstretch>
+      <verstretch>50</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>Sala de control</string>
+    </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>671</width>
+       <height>311</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="control_layout"/>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>20</y>
+       <width>661</width>
+       <height>311</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="options_layout"/>
+    </widget>
+    <zorder>horizontalLayoutWidget_2</zorder>
+    <zorder>horizontalLayoutWidget_3</zorder>
+    <zorder>line</zorder>
+   </widget>
+   <widget class="QGroupBox" name="robots_container">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>360</y>
+      <width>1371</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Robots</string>
+    </property>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>1371</width>
+       <height>291</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="robots_layout"/>
+    </widget>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>350</y>
+      <width>1371</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1373</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAcerca">
+    <property name="title">
+     <string>Acerca</string>
+    </property>
+    <addaction name="actionAcerca_de_Olympus"/>
+   </widget>
+   <widget class="QMenu" name="menuOpciones_2">
+    <property name="title">
+     <string>Opciones</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionPreferencias"/>
+    <addaction name="separator"/>
+    <addaction name="actionSalir"/>
+   </widget>
+   <addaction name="menuOpciones_2"/>
+   <addaction name="menuAcerca"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAcerca_de_Olympus">
+   <property name="text">
+    <string>Acerca de Olympus</string>
+   </property>
+  </action>
+  <action name="actionPreferencias">
+   <property name="text">
+    <string>Preferencias</string>
+   </property>
+  </action>
+  <action name="actionSalir">
+   <property name="text">
+    <string>Salir</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
