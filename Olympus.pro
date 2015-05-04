@@ -23,14 +23,18 @@ SOURCES += main.cpp      \
         robot.cpp        \
         preferencias.cpp \
         console.cpp      \
-        messenger.cpp
+        messenger.cpp \
+    verifytime.cpp \
+    swarm.cpp
 
 HEADERS  += olymain.h      \
             robot.h        \
             preferencias.h \
             console.h      \
             protocolo.h    \
-            messenger.h
+            messenger.h \
+    verifytime.h \
+    swarm.h
 
 FORMS    += olymain.ui  \
             preferencias.ui 

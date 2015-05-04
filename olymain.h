@@ -4,18 +4,19 @@
 #include <QMainWindow>
 #include <iostream>
 #include <vector>
-#include "robot.h"
-#include <QDebug>
 #include <fstream>
 #include <string>
 #include <qmessagebox.h>
 #include <QToolButton>
-#include "console.h"
+#include <QtCore>
 #include <sstream>
-#include "messenger.h"
 #include <QSerialPort>
+#include "console.h"
+#include "messenger.h"
 #include "preferencias.h"
 #include "protocolo.h"
+#include "verifytime.h"
+#include "swarm.h"
 
 #define option_connect        0
 #define option_disconnect     1
@@ -56,13 +57,21 @@ private:
     Ui::olymain *ui;
     int num_robots;
     bool manual_control;
-    vector <robot*> robots;
     Console *board;
     Console *terminal;
     QSerialPort *serial;
     messenger *sender;
     QToolButton **options;
     preferencias *settings;
+    QQueue<QString> *messages_queue;
+    QThread thread;
+    QTimer timer;
+    verifyTime *checker;
+    swarm *swarm_object;
+    //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
+    bool sender_safe;
+    bool queue_safe;
+
 };
 
 #endif // OLYMAIN_H

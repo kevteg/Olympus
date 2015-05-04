@@ -8,6 +8,10 @@
 
 class protocolo{
 public:
+    enum importante{
+        tam_min = 5
+    };
+
     enum comportamientos{
         Explorar           = 'A',
         Evadir             = 'B',
@@ -20,9 +24,7 @@ public:
     enum caracteres_intermedios{
          delimitador_i = '<',  //Delimitador inicial de mensajes
          delimitador_f = '>',  //Delimitaador final de mensajes
-         separador     = ':',  //Separador de los mensajes
-         excep_distancia    = '1',  //Mensaje de error en caso de generarse una excepción de distancia, se recibe del robot
-         excep_infrarrojo   = '2'   //Mensaje de error en caso de generarse una excepción de sensores, se recibe del robot
+         separador     = ':'  //Separador de los mensajes
     };
     enum control_robot{
         buscar             = '?',
@@ -31,8 +33,8 @@ public:
         abajo              = '2',
         derecha            = '3',
         izquierda          = '4',
-        e_distancia        = 0,
-        e_infrarojo        = 1,
+        sensor_distancia   = 0,
+        sensor_infrarojo   = 1,
         numero_excepciones = 2
     };
     enum joystick_c{

@@ -1,15 +1,15 @@
 #include "robot.h"
 
-robot::robot(QString name, char identificator, char default_behave, messenger *sender, QWidget *parent) : QGroupBox(name, parent){
-    board = new Console(Qt::lightGray, Qt::black, "--", this);
+robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox(name, parent){
+    board = new Console(Qt::lightGray, Qt::black, "> ", this);
     this->setStyleSheet("QGroupBox{ background: qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop:0 #006666, stop: 1 #FFFFFF); color: black; font: 10pt ;font: bold; text-align:center;   } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top left;}");
-    this->name = name.toStdString();
+    this->name = name;
     this->identificator = identificator;
     this->behave = default_behave;
     exceptions = new bool[protocolo::numero_excepciones];
-    exceptions[protocolo::e_distancia] = false;
-    exceptions[protocolo::e_infrarojo] = false;
-
+    exceptions[protocolo::sensor_distancia] = false;
+    exceptions[protocolo::sensor_infrarojo] = false;
+    //qDebug() << QChar(identificator);
     things_layout = new QVBoxLayout;
     actual_behavior = new QLabel("Comportamiento", this);
     exceptions_group = new QGroupBox("Exepciones", this);
@@ -31,19 +31,26 @@ robot::robot(QString name, char identificator, char default_behave, messenger *s
     things_layout->addWidget(actual_behavior);
     this->setLayout(things_layout);
 }
-string robot::getName(){
+QString robot::getName(){
     return name;
 }
 
 char robot::getIdentificator(){
     return identificator;
 }
-void robot::processOrder(string data){
-    qDebug() << QString::fromStdString(data);;
+void robot::processOrder(QString data){
+    qDebug() << "Procesando: " << data;
+
+    board->putData(data.toLatin1() + '\n');
 }
+bool robot::getException(int exception_tipe){
+    return exceptions[exception_tipe];
+}
+void robot::setBehave(string new_behave){
 
-robot::~robot()
-{
-
+}
+robot::~robot(){
+    delete board;
+    delete exceptions;
 }
 

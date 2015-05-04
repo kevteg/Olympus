@@ -26,6 +26,6 @@ void messenger::sendMessage(const QByteArray &data){
 }
 
 messenger::~messenger(){
-
+    delete serial;
 }
 
