@@ -31,7 +31,7 @@ void verifyTime::onTimeout(){
                 terminal->putData(QString("Se envia: "+mensaje+" a "+robot_name+"\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{
-                terminal->putData(QString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
+                terminal->putData(QtString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
                 qDebug() << "Envio fallidos";
            }
            *sender_safe = true;

@@ -27,10 +27,17 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     messages_queue->enqueue("<A:A>");
     messages_queue->enqueue("<B:A>");
     messages_queue->enqueue("<C:A>");
-    messages_queue->enqueue("<A:A>");
-    messages_queue->enqueue("<B:A>");
     messages_queue->enqueue("<asdlajsdh>");
     messages_queue->enqueue("<a>");
+    messages_queue->enqueue("<A:B>");
+    messages_queue->enqueue("<B:B>");
+    messages_queue->enqueue("<C:B>");
+    messages_queue->enqueue("<A:C>");
+    messages_queue->enqueue("<B:C>");
+    messages_queue->enqueue("<C:C>");
+    messages_queue->enqueue("<A:!>");
+    messages_queue->enqueue("<B:!>");
+    messages_queue->enqueue("<C:!>");
 
 
 
@@ -87,6 +94,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         setConections();
         defaultSituation();
     }
+    //swarm_object->getRobots()->at(0)->processOrder("<B:A>");
     thread.start();
 }
 bool olymain::openPreFile(){

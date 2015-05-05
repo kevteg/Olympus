@@ -5,7 +5,7 @@
  */
 #ifndef PROTOCOLO
 #define PROTOCOLO
-
+#include <QString>
 class protocolo{
 public:
     enum importante{
@@ -18,6 +18,9 @@ public:
         Seguir_instruccion = 'C',
         Detener            = '!'
     };
+
+    static QString *cadenas_comportamientos;
+
     enum robot_defecto{
         todos_robots = 'X'
     };
@@ -46,6 +49,74 @@ public:
          derecha_j   = 3,
          izquierda_j = 4
     };
+
+    static QString getCadenaComportamiento(char comportamiento){
+        switch(comportamiento){
+            case Explorar:
+                return "Explorar";
+            break;
+            case Evadir:
+                return "Evadir";
+            break;
+            case Seguir_instruccion:
+                return "Seguir instrucciones";
+            break;
+            case Detener:
+                return "Detenido";
+            break;
+        }
+        return "err";
+    }
+
+    static bool verificacion(QByteArray data, int index){
+        /*5 es el tamaño mínimo de los mensajes*/
+        if(index < data.size() && data.size() >= protocolo::tam_min){
+            switch(data.at(index)){
+                case protocolo::delimitador_i:
+                    if(!(index == 0
+                       &&
+                       ((index + 1) < data.size() &&
+                        data.at(index + 1) != protocolo::delimitador_i &&
+                        data.at(index + 1) != protocolo::delimitador_f &&
+                        data.at(index + 1) != protocolo::separador)))
+                        return false;
+                break;
+                case protocolo::delimitador_f:
+                    if(index == (data.size() - 1) &&
+                       (index - 1 > 0 &&
+                        data.at(index - 1) != protocolo::delimitador_i &&
+                        data.at(index - 1) != protocolo::delimitador_f &&
+                        data.at(index - 1) != protocolo::separador))
+                        return true;
+                break;
+                case protocolo::separador:
+                    if(( (index + 1) < data.size()&&(
+                         (data.at(index + 1) == protocolo::delimitador_i) ||
+                         (data.at(index + 1) == protocolo::delimitador_f) ||
+                         data.at(index + 1) == protocolo::separador))
+                       ||
+                        ((index - 1) > 0 &&
+                         (data.at(index - 1) == protocolo::delimitador_i ||
+                         data.at(index - 1) == protocolo::delimitador_f ||
+                         data.at(index - 1) == protocolo::separador)))
+                        return false;
+                break;
+                default:
+                    if((index == 0 || index == (data.size() - 1)) ||
+                      ((index - 1 > 0 &&
+                       data.at(index - 1) != protocolo::delimitador_i &&
+                       data.at(index - 1) != protocolo::separador)
+                       ||
+                       (index + 1 < data.size() &&
+                       data.at(index + 1) != protocolo::delimitador_f &&
+                       data.at(index + 1) != protocolo::separador)))
+                       return false;
+                break;
+            }
+            return verificacion(data, index + 1);
+        }
+    return false;
+    }
 };
 
 #endif // PROTOCOLO
