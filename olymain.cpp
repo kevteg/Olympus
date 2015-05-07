@@ -27,12 +27,6 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
 
     qDebug()<<"Hilo principal: "<<QThread::currentThreadId();
     checker = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
-    connect(&timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
-    timer.start(500);
-    timer.moveToThread(&thread);
-    //checker->moveToThread(&thread);
-    /*EL HILO SE DEBE INICIAR DESPUÉS DE REALIZAR LA CONEXIÓN REAL. POR AHORA ES SOLO UNA PRUEBA*/
-
 
     QGroupBox *terminal_container        = new QGroupBox("Terminal", this);
     QGroupBox *board_container           = new QGroupBox("Pizarrón", this);
@@ -78,8 +72,6 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         setConections();
         defaultSituation();
     }
-    //swarm_object->getRobots()->at(0)->processOrder("<B:A>");
-
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -111,6 +103,11 @@ void olymain::defaultSituation(){
     terminal->putData("\n");
 }
 void olymain::setConections(){
+    /*Hilo*/
+    connect(&timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
+    connect(&thread, SIGNAL(finished()), &timer, SLOT(stop()));
+    timer.start(500);
+    timer.moveToThread(&thread);
     /*Opciones*/
     connect(options[option_exit], SIGNAL(clicked()), this, SLOT(close()));
     connect(options[option_connect], SIGNAL(clicked()), this, SLOT(connection()));
@@ -163,27 +160,35 @@ void olymain::recieveInformation(){
    if(sender_safe){
        sender_safe = false;
        QString robot_name;
+       QString rec = "";
        QByteArray data = serial->readAll();
         var += data;
+       qDebug() << var;
+       int index_1, index_2;
+       if(var.contains("<", Qt::CaseInsensitive) && var.contains(">", Qt::CaseInsensitive)){
+            index_1 = var.size() - 1;
+            while(index_1 > 0 && var.at(index_1) != '<')
+                index_1--;
+            index_2 = index_1;
+            while(index_2 < var.size() && var.at(index_2) != '>')
+                index_2++;
+            rec = var.mid(index_1, (index_2 - index_1 + 1));
+            var = "";
 
-       //if(protocolo::verificacion(var.toLatin1(), 0)){
-       robot_name = swarm_object->sendData(data);
-       if(robot_name != "err")
-           terminal->putData(QString("Se recibe: " + QString(data) + " de " + robot_name + "\n").toLatin1());
-       else
-           terminal->putData(QString("Mensaje: " + QString(data) + " está dañado, no cumple con el protocolo\n").toLatin1());
-        sender_safe = true;
-       var = "";
-       //}
-
-        qDebug() << var;
-
+       }
+       if(protocolo::verificacion(rec.toLatin1(), 0)){
+           robot_name = swarm_object->sendData(rec.toLatin1());
+           if(robot_name != "err")
+               terminal->putData(QString("Se recibe: " + QString(rec) + " de " + robot_name + "\n").toLatin1());
+           else
+               terminal->putData(QString("Mensaje: " + QString(rec) + " está dañado, no cumple con el protocolo\n").toLatin1());
+       }
+       sender_safe = true;
    }
 }
 
 olymain::~olymain(){
     thread.quit();
-    timer.stop();
     delete ui;
     delete board;
     delete terminal;

@@ -9,8 +9,7 @@ verifyTime::verifyTime(Console *terminal, swarm *swarm_object, bool *sender_safe
     this->terminal = terminal;
 }
 
-verifyTime::~verifyTime()
-{
+verifyTime::~verifyTime(){
 
 }
 
@@ -32,8 +31,10 @@ void verifyTime::onTimeout(){
                 terminal->putData(QString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
                 qDebug() << "Envio fallidos";
            }
-           *sender_safe = true;
-           *queue_safe = true;
        }
-   }
+       *sender_safe = true;
+       *queue_safe = true;
+   }else
+       qDebug() << "SON FALSE";
+
 }

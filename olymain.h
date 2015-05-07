@@ -52,7 +52,8 @@ private slots:
     void stop();
     void openAbout();
     void recieveInformation();
-
+signals:
+    void stopTimer();
 private:
     Ui::olymain *ui;
     int num_robots;
