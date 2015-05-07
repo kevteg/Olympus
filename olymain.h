@@ -71,6 +71,7 @@ private:
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
     bool sender_safe;
     bool queue_safe;
+    QString var;
 
 };
 

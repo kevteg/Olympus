@@ -15,23 +15,21 @@ verifyTime::~verifyTime()
 }
 
 void verifyTime::onTimeout(){
-    /*AL PROBAR MODIFICAR AQUI*/
    if(sender_safe && queue_safe){
        *sender_safe = false;
        *queue_safe = false;
        QString robot_name;
-       if(!messages_queue->isEmpty() /*&& sender->getSerial()->isOpen()*/){
+       if(!messages_queue->isEmpty() && sender->getSerial()->isOpen()){
            QString mensaje = messages_queue->dequeue();
            qDebug()<<"Hilo: "<<QThread::currentThreadId() << " intenta enviar: " << mensaje;
            robot_name = swarm_object->sendData(mensaje.toLatin1());
            /*Antes de enviar se verifica que lo que este en la cola. Si esta bien el mensaje se envia*/
            if(robot_name != "err"){
-                if(sender->getSerial()->isOpen())
-                    sender->sendMessage(mensaje.toLatin1());
+                sender->sendMessage(mensaje.toLatin1());
                 terminal->putData(QString("Se envia: "+mensaje+" a "+robot_name+"\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{
-                terminal->putData(QtString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
+                terminal->putData(QString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
                 qDebug() << "Envio fallidos";
            }
            *sender_safe = true;

@@ -14,39 +14,23 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     swarm_object    = new swarm();
     //Cola de mensajes que se irán guardando y enviando cada cierto tiempo
     messages_queue  = new QQueue<QString>;
-
+    messages_queue->enqueue("<A:E:1:0>");
     sender_safe     = true;
     queue_safe      = true;
-
+    var = "";
     botones[option_connect]        = string("Conectar");
     botones[option_disconnect]     = string("Desconectar");
     botones[option_stop]           = string("Detener");
     botones[option_start]          = string("Iniciar");
     botones[option_manual_control] = string("Control manual");
     botones[option_exit]           = string("Salir");
-    messages_queue->enqueue("<A:A>");
-    messages_queue->enqueue("<B:A>");
-    messages_queue->enqueue("<C:A>");
-    messages_queue->enqueue("<asdlajsdh>");
-    messages_queue->enqueue("<a>");
-    messages_queue->enqueue("<A:B>");
-    messages_queue->enqueue("<B:B>");
-    messages_queue->enqueue("<C:B>");
-    messages_queue->enqueue("<A:C>");
-    messages_queue->enqueue("<B:C>");
-    messages_queue->enqueue("<C:C>");
-    messages_queue->enqueue("<A:!>");
-    messages_queue->enqueue("<B:!>");
-    messages_queue->enqueue("<C:!>");
-
-
 
     qDebug()<<"Hilo principal: "<<QThread::currentThreadId();
     checker = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
     connect(&timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
     timer.start(500);
     timer.moveToThread(&thread);
-    checker->moveToThread(&thread);
+    //checker->moveToThread(&thread);
     /*EL HILO SE DEBE INICIAR DESPUÉS DE REALIZAR LA CONEXIÓN REAL. POR AHORA ES SOLO UNA PRUEBA*/
 
 
@@ -95,7 +79,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         defaultSituation();
     }
     //swarm_object->getRobots()->at(0)->processOrder("<B:A>");
-    thread.start();
+
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -105,8 +89,8 @@ bool olymain::openPreFile(){
     if(pre.is_open()){
         while(getline(pre, line)){
             if(line[0] == '>'){
-                QString nombre = QString::fromStdString(line.substr(3));
-                swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[2], messages_queue, &queue_safe, this));
+                QString nombre = QString::fromStdString(line.substr(5));
+                swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[3], messages_queue, &queue_safe, this));
                 ui->robots_layout->addWidget(swarm_object->getRobots()->at(index++));
             }else if(line[0] == '<'){
                 size_t pos = line.find(":");
@@ -140,9 +124,7 @@ void olymain::setConections(){
     connect(serial, SIGNAL(readyRead()), this, SLOT(recieveInformation()));
 }
 void olymain::connection(){
-     messages_queue->enqueue("<A:A>");
-     /*AQUI DEBERIA INICIAR EL HILO*/
-    /*preferencias::preferencia opt = settings->Preferencia();
+    preferencias::preferencia opt = settings->Preferencia();
     if(sender->createConnection(opt)){
         options[option_connect]->setEnabled(false);
         options[option_disconnect]->setEnabled(true);
@@ -151,7 +133,7 @@ void olymain::connection(){
     }else{
         QMessageBox::critical(this, tr("Error con el puerto seleccionado"), serial->errorString());
         ui->statusBar->showMessage(tr("Error al abrir serial"));
-    }*/
+    }
 }
 void olymain::disconnection(){
     sender->breakConnection();
@@ -162,6 +144,7 @@ void olymain::disconnection(){
     options[option_stop]->setEnabled(false);
 }
 void olymain::begin(){
+    thread.start();
     options[option_manual_control]->setEnabled(manual_control);
     options[option_start]->setEnabled(false);
     options[option_stop]->setEnabled(true);
@@ -181,12 +164,20 @@ void olymain::recieveInformation(){
        sender_safe = false;
        QString robot_name;
        QByteArray data = serial->readAll();
+        var += data;
+
+       //if(protocolo::verificacion(var.toLatin1(), 0)){
        robot_name = swarm_object->sendData(data);
        if(robot_name != "err")
            terminal->putData(QString("Se recibe: " + QString(data) + " de " + robot_name + "\n").toLatin1());
        else
-           terminal->putData(QString("Mensaje: " + QString(data) + " está dañado o no cumple con el protocolo\n").toLatin1());
-       sender_safe = true;
+           terminal->putData(QString("Mensaje: " + QString(data) + " está dañado, no cumple con el protocolo\n").toLatin1());
+        sender_safe = true;
+       var = "";
+       //}
+
+        qDebug() << var;
+
    }
 }
 

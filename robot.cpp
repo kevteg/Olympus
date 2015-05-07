@@ -6,10 +6,11 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     this->name = name;
     this->identificator = identificator;
     this->behave = default_behave;
+
     exceptions = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
-    //qDebug() << QChar(identificator);
+    //qDebug() << QChar(default_behave);
     things_layout = new QVBoxLayout;
     actual_behavior = new QLabel("Comportamiento", this);
     exceptions_group = new QGroupBox("Exepciones", this);
@@ -30,7 +31,17 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     things_layout->addWidget(exceptions_group);
     things_layout->addWidget(actual_behavior);
     this->setLayout(things_layout);
+    string _first_m;
+    _first_m = protocolo::delimitador_i;
+    _first_m += this->identificator;
+    _first_m += protocolo::separador;
+    _first_m += this->behave;
+    _first_m += protocolo::delimitador_f;
+    *queue_safe = false;
+    messages_queue->enqueue(QString().fromStdString(_first_m));
+    *queue_safe = true;
 }
+
 QString robot::getName(){
     return name;
 }

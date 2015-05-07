@@ -25,7 +25,6 @@ public:
     void processOrder(QString data);
     /*Se cambia el comportamiento actual, NOTA: si es alguno de los comportamientos definidos en seguir instrucciones el comportamiento cambia automaticamente*/
     void setBehave(string new_behave);
-
     ~robot();
 private:
     QVBoxLayout *things_layout;
