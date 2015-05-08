@@ -10,7 +10,6 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
-    //qDebug() << QChar(default_behave);
     things_layout = new QVBoxLayout;
     actual_behavior = new QLabel("Comportamiento", this);
     exceptions_group = new QGroupBox("Exepciones", this);

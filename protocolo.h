@@ -70,7 +70,6 @@ public:
 
     static bool verificacion(QByteArray data, int index){
         /*5 es el tamaño mínimo de los mensajes*/
-
         if(index < data.size() && data.size() >= protocolo::tam_min){
             switch(data.at(index)){
                 case protocolo::delimitador_i:

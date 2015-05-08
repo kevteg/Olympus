@@ -106,8 +106,6 @@ void olymain::setConections(){
     /*Hilo*/
     connect(&timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
     connect(&thread, SIGNAL(finished()), &timer, SLOT(stop()));
-    timer.start(500);
-    timer.moveToThread(&thread);
     /*Opciones*/
     connect(options[option_exit], SIGNAL(clicked()), this, SLOT(close()));
     connect(options[option_connect], SIGNAL(clicked()), this, SLOT(connection()));
@@ -141,6 +139,8 @@ void olymain::disconnection(){
     options[option_stop]->setEnabled(false);
 }
 void olymain::begin(){
+    timer.start(500);
+    timer.moveToThread(&thread);
     thread.start();
     options[option_manual_control]->setEnabled(manual_control);
     options[option_start]->setEnabled(false);
@@ -174,7 +174,6 @@ void olymain::recieveInformation(){
                 index_2++;
             rec = var.mid(index_1, (index_2 - index_1 + 1));
             var = "";
-
        }
        if(protocolo::verificacion(rec.toLatin1(), 0)){
            robot_name = swarm_object->sendData(rec.toLatin1());
