@@ -14,10 +14,10 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     swarm_object    = new swarm();
     //Cola de mensajes que se irán guardando y enviando cada cierto tiempo
     messages_queue  = new QQueue<QString>;
-    messages_queue->enqueue("<A:E:1:0>");
+
     sender_safe     = true;
     queue_safe      = true;
-    var = "";
+    var             = "";
     botones[option_connect]        = string("Conectar");
     botones[option_disconnect]     = string("Desconectar");
     botones[option_stop]           = string("Detener");
@@ -80,11 +80,11 @@ bool olymain::openPreFile(){
     ifstream pre("conf.oly");
     if(pre.is_open()){
         while(getline(pre, line)){
-            if(line[0] == '>'){
+            if(line[0] == protocolo::delimitador_f){
                 QString nombre = QString::fromStdString(line.substr(5));
                 swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[3], messages_queue, &queue_safe, this));
                 ui->robots_layout->addWidget(swarm_object->getRobots()->at(index++));
-            }else if(line[0] == '<'){
+            }else if(line[0] == protocolo::delimitador_i){
                 size_t pos = line.find(":");
                 QString des = QString::fromStdString(line.substr(pos + 1));
                 manual_control = (des == "si")?true:false;
@@ -165,12 +165,12 @@ void olymain::recieveInformation(){
         var += data;
        qDebug() << var;
        int index_1, index_2;
-       if(var.contains("<", Qt::CaseInsensitive) && var.contains(">", Qt::CaseInsensitive)){
+       if(var.contains(protocolo::delimitador_i, Qt::CaseInsensitive) && var.contains(protocolo::delimitador_f, Qt::CaseInsensitive)){
             index_1 = var.size() - 1;
-            while(index_1 > 0 && var.at(index_1) != '<')
+            while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_i)
                 index_1--;
             index_2 = index_1;
-            while(index_2 < var.size() && var.at(index_2) != '>')
+            while(index_2 < var.size() && var.at(index_2) != protocolo::delimitador_f)
                 index_2++;
             rec = var.mid(index_1, (index_2 - index_1 + 1));
             var = "";
@@ -180,7 +180,7 @@ void olymain::recieveInformation(){
            if(robot_name != "err")
                terminal->putData(QString("Se recibe: " + QString(rec) + " de " + robot_name + "\n").toLatin1());
            else
-               terminal->putData(QString("Mensaje: " + QString(rec) + " está dañado, no cumple con el protocolo\n").toLatin1());
+               terminal->putData(QString("Mensaje: " + QString(rec) + QString::fromLatin1(" está dañado, no cumple con el protocolo\n")).toLatin1());
        }
        sender_safe = true;
    }

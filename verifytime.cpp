@@ -25,7 +25,7 @@ void verifyTime::onTimeout(){
            /*Antes de enviar se verifica que lo que este en la cola. Si esta bien el mensaje se envia*/
            if(robot_name != "err"){
                 sender->sendMessage(mensaje.toLatin1());
-                terminal->putData(QString("Se envia: "+mensaje+" a "+robot_name+"\n").toLatin1());
+                terminal->putData(QString(QString::fromLatin1("Se envía: ") + mensaje + " a " + (robot_name.toLatin1()) + "\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{
                 terminal->putData(QString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
@@ -34,7 +34,5 @@ void verifyTime::onTimeout(){
        }
        *sender_safe = true;
        *queue_safe = true;
-   }else
-       qDebug() << "SON FALSE";
-
+   }
 }

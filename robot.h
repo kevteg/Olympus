@@ -11,6 +11,10 @@
 #include <QQueue>
 #include "messenger.h"
 #include "protocolo.h"
+#define _main 0
+#define secondary 1
+#define n_behaves 2
+#define none '-'
 
 using namespace std;
 class robot : public QGroupBox{
@@ -30,12 +34,11 @@ private:
     QVBoxLayout *things_layout;
     Console *board; //Las consolas se usarán como pizarrones
     QGroupBox *exceptions_group;
-    QCheckBox *sensor_infrarojo;
-    QCheckBox *sensor_ultrasonido;
+    QCheckBox **sensores;
     QLabel *actual_behavior;
     QString name;
     char identificator;
-    char behave;
+    char *behave;
     bool *exceptions;
 };
 

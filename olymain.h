@@ -55,24 +55,24 @@ private slots:
 signals:
     void stopTimer();
 private:
-    Ui::olymain *ui;
-    int num_robots;
-    bool manual_control;
-    Console *board;
-    Console *terminal;
-    QSerialPort *serial;
-    messenger *sender;
-    QToolButton **options;
-    preferencias *settings;
+    Ui::olymain     *ui;
+    int             num_robots;
+    bool            manual_control;
+    Console         *board;
+    Console         *terminal;
+    QSerialPort     *serial;
+    messenger       *sender;
+    QToolButton     **options;
+    preferencias    *settings;
     QQueue<QString> *messages_queue;
-    QThread thread;
-    QTimer timer;
-    verifyTime *checker;
-    swarm *swarm_object;
+    QThread         thread;
+    QTimer          timer;
+    verifyTime      *checker;
+    swarm           *swarm_object;
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
-    bool sender_safe;
-    bool queue_safe;
-    QString var;
+    bool            sender_safe;
+    bool            queue_safe;
+    QString         var;
 
 };
 

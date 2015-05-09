@@ -18,6 +18,12 @@ public:
         Seguir_instruccion = 'C',
         Detener            = '!'
     };
+    enum tipo_instruccion{
+        Comportamiento = 0,
+        Busqueda       = 1,
+        Excepcion_tipo = 2,
+        Caracteres     = 3
+    };
 
     static QString *cadenas_comportamientos;
 
@@ -32,8 +38,8 @@ public:
     enum control_robot{
         buscar             = '?',
         excepcion          = 'E',
-        arriba             = '1',
-        abajo              = '2',
+        adelante           = '1',
+        atras              = '2',
         derecha            = '3',
         izquierda          = '4',
         sensor_distancia   = 0,
@@ -50,8 +56,8 @@ public:
          izquierda_j = 4
     };
 
-    static QString getCadenaComportamiento(char comportamiento){
-        switch(comportamiento){
+    static QString getCadenaInstruccion(char instruccion){
+        switch(instruccion){
             case Explorar:
                 return "Explorar";
             break;
@@ -64,8 +70,46 @@ public:
             case Detener:
                 return "Detenido";
             break;
+            case adelante:
+                return "adelante";
+            break;
+            case atras:
+                return "atras";
+            break;
+            case derecha:
+                return "derecha";
+            break;
+            case izquierda:
+                return "izquierda";
+            break;
         }
         return "err";
+    }
+    static int getTipoInstruccion(char instruccion){
+        switch(instruccion){
+            case Explorar:
+            case Evadir:
+            case Seguir_instruccion:
+            case Detener:
+            case adelante:
+            case atras:
+            case derecha:
+            case izquierda:
+                return Comportamiento;
+            break;
+            case buscar:
+                return Busqueda;
+            break;
+            case excepcion:
+                return Excepcion_tipo;
+            break;
+            break;
+            case delimitador_i :
+            case delimitador_f:
+            case separador:
+                return Caracteres;
+            break;
+        }
     }
 
     static bool verificacion(QByteArray data, int index){
