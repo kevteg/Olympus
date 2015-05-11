@@ -19,10 +19,10 @@ public:
         Detener            = '!'
     };
     enum tipo_instruccion{
-        Comportamiento = 0,
-        Busqueda       = 1,
-        Excepcion_tipo = 2,
-        Caracteres     = 3
+        Comportamiento_tipo = 0,
+        Busqueda_tipo       = 1,
+        Excepcion_tipo      = 2,
+        Caracteres_tipo     = 3
     };
 
     static QString *cadenas_comportamientos;
@@ -95,10 +95,10 @@ public:
             case atras:
             case derecha:
             case izquierda:
-                return Comportamiento;
+                return Comportamiento_tipo;
             break;
             case buscar:
-                return Busqueda;
+                return Busqueda_tipo;
             break;
             case excepcion:
                 return Excepcion_tipo;
@@ -107,7 +107,7 @@ public:
             case delimitador_i :
             case delimitador_f:
             case separador:
-                return Caracteres;
+                return Caracteres_tipo;
             break;
         }
     }

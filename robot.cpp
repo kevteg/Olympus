@@ -6,6 +6,9 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     this->name = name;
     this->identificator = identificator;
     this->behave = new char[n_behaves];
+    this->sender_safe = sender_safe;
+    this->queue_safe = queue_safe;
+    this->messages_queue = messages_queue;
     /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
     this->behave[_main] = none;
     this->behave[secondary] = none;
@@ -60,7 +63,7 @@ void robot::processOrder(QString data){
     /*El robot vuelve a verificar que la orden este bien*/
     if(protocolo::verificacion(data.toLatin1(), 0) && data.at(1) == this->identificator){
         switch (protocolo::getTipoInstruccion(data.at(3).toLatin1())) {
-        case protocolo::Comportamiento:
+        case protocolo::Comportamiento_tipo:
             if(behave[_main] != data.at(3).toLatin1()){
                 behave[_main] = data.at(3).toLatin1();
                 actual_behavior->setText("Comportamiento: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n");
@@ -78,7 +81,7 @@ void robot::processOrder(QString data){
             else
                 actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");
         break;
-        case protocolo::Busqueda:
+        case protocolo::Busqueda_tipo:
             /*Podría ser que se guarde si se habia buscado*/
             board->putData(QString("Buscando...\n").toLatin1());
         break;
@@ -98,6 +101,29 @@ bool robot::getException(int exception_tipe){
 void robot::setBehave(string new_behave){
 
 }
+bool robot::setException(int exception_type, bool option){
+    qDebug() << this->behave[_main] ;
+    if(this->behave[_main] == protocolo::Seguir_instruccion
+       && (exception_type == protocolo::sensor_distancia || exception_type == protocolo::sensor_infrarojo)){
+        string message;
+        message = protocolo::delimitador_i;
+        message += this->identificator;
+        message += protocolo::separador;
+        message += protocolo::excepcion;
+        message += protocolo::separador;
+        message += exception_type + 48;
+        message += protocolo::separador;
+        message += option?'1':'0';
+        message += protocolo::delimitador_f;
+        *queue_safe = false;
+        messages_queue->enqueue(QString().fromStdString(message));
+        *queue_safe = true;
+        return true;
+    }else
+        qDebug() << "Error: No se pueden cambiar las excepeciones porque el comportamiento por defecto no es seguir instrucciones.";
+    return false;
+}
+
 robot::~robot(){
     delete board;
     delete exceptions;

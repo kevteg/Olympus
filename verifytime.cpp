@@ -18,7 +18,7 @@ void verifyTime::onTimeout(){
        *sender_safe = false;
        *queue_safe = false;
        QString robot_name;
-       if(!messages_queue->isEmpty() && sender->getSerial()->isOpen()){
+       if(!messages_queue->isEmpty() /*&& sender->getSerial()->isOpen()*/){
            QString mensaje = messages_queue->dequeue();
            qDebug()<<"Hilo: "<<QThread::currentThreadId() << " intenta enviar: " << mensaje;
            robot_name = swarm_object->sendData(mensaje.toLatin1());
