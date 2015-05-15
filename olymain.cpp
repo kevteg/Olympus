@@ -159,22 +159,27 @@ void olymain::openAbout(){
 void olymain::recieveInformation(){
    if(sender_safe){
        sender_safe = false;
+       int index_1, index_2;
        QString robot_name;
        QString rec = "";
        QByteArray data = serial->readAll();
-        var += data;
+
+       var += data;
        qDebug() << var;
-       int index_1, index_2;
-       if(var.contains(protocolo::delimitador_i, Qt::CaseInsensitive) && var.contains(protocolo::delimitador_f, Qt::CaseInsensitive)){
+       if(var.contains(protocolo::delimitador_f, Qt::CaseInsensitive)){
             index_1 = var.size() - 1;
-            while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_i)
+            while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_f)
                 index_1--;
-            index_2 = index_1;
-            while(index_2 < var.size() && var.at(index_2) != protocolo::delimitador_f)
+
+            index_2 = 0;
+            while(index_2 < var.size() && var.at(index_2) != protocolo::delimitador_i)
                 index_2++;
-            rec = var.mid(index_1, (index_2 - index_1 + 1));
+            rec = var.mid(index_2, (index_1 - index_2 + 1));
+
+            qDebug() << "REC: " << rec;
             var = "";
        }
+
        if(protocolo::verificacion(rec.toLatin1(), 0)){
            robot_name = swarm_object->sendData(rec.toLatin1());
            if(robot_name != "err")

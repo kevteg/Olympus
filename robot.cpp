@@ -59,41 +59,47 @@ char robot::getIdentificator(){
     return identificator;
 }
 void robot::processOrder(QString data){
-    qDebug() << "Procesando: " << data;
-    /*El robot vuelve a verificar que la orden este bien*/
-    if(protocolo::verificacion(data.toLatin1(), 0) && data.at(1) == this->identificator){
-        switch (protocolo::getTipoInstruccion(data.at(3).toLatin1())) {
-        case protocolo::Comportamiento_tipo:
-            if(behave[_main] != data.at(3).toLatin1()){
-                behave[_main] = data.at(3).toLatin1();
-                actual_behavior->setText("Comportamiento: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n");
-                board->putData(QString("Nuevo comportamiento definido: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n").toLatin1());
-            }
-            if(data.size() > protocolo::tam_min){
-                if(behave[secondary] != data.at(5).toLatin1()){
-                    behave[secondary] = data.at(5).toLatin1();
-                    board->putData(QString(QString::fromLatin1("Nueva dirección: ") + protocolo::getCadenaInstruccion(data.at(5).toLatin1()) + "\n").toLatin1());
+    if(data != old_m){
+        qDebug() << "Procesando: " << data;
+        old_m = data;
+        /*El robot vuelve a verificar que la orden este bien*/
+        if(protocolo::verificacion(data.toLatin1(), 0) && data.at(1) == this->identificator){
+            switch (protocolo::getTipoInstruccion(data.at(3).toLatin1())) {
+            case protocolo::Comportamiento_tipo:
+                if(behave[_main] != data.at(3).toLatin1()){
+                    behave[_main] = data.at(3).toLatin1();
+                    actual_behavior->setText("Comportamiento: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n");
+                    board->putData(QString("Nuevo comportamiento definido: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n").toLatin1());
                 }
-            }else
-                behave[secondary] = none;
-            if(data.at(3).toLatin1() == protocolo::Detener)
-                actual_behavior->setStyleSheet("QLabel{color:red; font:12pt; font:bold;}");
-            else
-                actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");
-        break;
-        case protocolo::Busqueda_tipo:
-            /*Podría ser que se guarde si se habia buscado*/
-            board->putData(QString("Buscando...\n").toLatin1());
-        break;
-        case protocolo::Excepcion_tipo:
-            exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
-            sensores[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
-            board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
-        break;
-        }
+                if(data.size() > protocolo::tam_min){
+                    if(behave[secondary] != data.at(5).toLatin1()){
+                        behave[secondary] = data.at(5).toLatin1();
+                        board->putData(QString(QString::fromLatin1("Nueva dirección: ") + protocolo::getCadenaInstruccion(data.at(5).toLatin1()) + "\n").toLatin1());
+                    }
+                }else
+                    behave[secondary] = none;
+                if(data.at(3).toLatin1() == protocolo::Detener)
+                    actual_behavior->setStyleSheet("QLabel{color:red; font:12pt; font:bold;}");
+                else
+                    actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");
+            break;
+            case protocolo::Busqueda_tipo:
+                /*Podría ser que se guarde si se habia buscado*/
+                board->putData(QString("Buscando...\n").toLatin1());
+            break;
+            case protocolo::Excepcion_tipo:
+                if(data.size() > 7){
+                    exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
+                    sensores[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
+                    board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
+                }
+            break;
+            }
 
+        }else
+            board->putData(QString(QString::fromLatin1("Error: he recibido información errónea: ") + data.toLatin1() + "\n").toLatin1());
     }else
-        board->putData(QString(QString::fromLatin1("Error: he recibido información errónea: ") + data.toLatin1() + "\n").toLatin1());
+        qDebug() << "Mensaje ya procesado: " << data;
 }
 bool robot::getException(int exception_tipe){
     return exceptions[exception_tipe];

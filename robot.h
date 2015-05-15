@@ -46,6 +46,7 @@ private:
     QString          name;
     QQueue<QString>* messages_queue;
     char             identificator;
+    QString          old_m;
     char             *behave;
     bool             *exceptions;
     bool             *queue_safe;
