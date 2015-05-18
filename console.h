@@ -9,7 +9,10 @@
 #include <QPlainTextEdit>
 #include <QScrollBar>
 #include <QtCore/QDebug>
-
+#include <fstream>
+#include <string>
+#include <sstream>
+using namespace std;
 class Console : public QPlainTextEdit
 {
     Q_OBJECT
@@ -24,13 +27,25 @@ signals:
      * @param e: tecla presionada
      */
     void getFlechas(QKeyEvent *e);
+    /**
+     * @brief Señal usada para mostrar about en olymain
+     */
+    void showAbout();
+    /**
+     * @brief Señal usada para mostrar o no los mensajes que llegan al programa
+     */
+    void changeMstate();
+    /**
+     * @brief Señal usada para salir del programa
+     */
+    void exitProgram();
 
 public:
     /**
      * @brief Constructor de la consola
      * @param QWidget *parent = 0: Parametro de qt, padre de la consola
      */
-    explicit Console(QColor color_base, QColor color_text, QString nueva_linea, QWidget *parent = 0);
+    explicit Console(QColor color_base, QColor color_text, QString nueva_linea, bool localEchoEnabled, QWidget *parent = 0);
     /**
      * @brief Poner datos sobre la consola
      * @param const QByteArray &data: String que se pondrá en la consola
@@ -41,6 +56,7 @@ public:
      * @param bool set: si es true se podrá ver lo que se ha escrito al robot
      */
     void setLocalEchoEnabled(bool set);
+    void executeCommand(QString command);
 private slots:
     /**
      * @brief Limpiar el texto de la terminal
@@ -53,6 +69,7 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *e);
 
 private:
+    stringstream command;
     bool localEchoEnabled;
     QByteArray nueva_linea;
 

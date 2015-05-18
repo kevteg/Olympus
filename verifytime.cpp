@@ -28,8 +28,8 @@ void verifyTime::onTimeout(){
                 terminal->putData(QString(QString::fromLatin1("Se envía: ") + mensaje + " a " + (robot_name.toLatin1()) + "\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{
-                terminal->putData(QString("Error: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
-                qDebug() << "Envio fallidos";
+                terminal->putData(QString("Error[6]: mensaje no cumple protocolo: "+mensaje+"\n").toLatin1());
+                qDebug() << "Envio fallido";
            }
        }
        *sender_safe = true;

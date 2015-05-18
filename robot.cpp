@@ -1,7 +1,7 @@
 #include "robot.h"
 /*TODO: Una guía del protocolo*/
 robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox(name, parent){
-    board = new Console(Qt::lightGray, Qt::black, "> ", this);
+    board = new Console(Qt::lightGray, Qt::black, "> ", false, this);
     this->setStyleSheet("QGroupBox{ background: qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop:0 #006666, stop: 1 #FFFFFF); color: black; font: 10pt ;font: bold; text-align:center;   } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top left;}");
     this->name = name;
     this->identificator = identificator;
@@ -14,8 +14,8 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     this->behave[secondary] = none;
 
     sensores = new QCheckBox*[protocolo::numero_excepciones] ;
-    sensores[protocolo::sensor_distancia]  = new QCheckBox("Distancia", this);
-    sensores[protocolo::sensor_infrarojo]  = new QCheckBox("Infrarojo", this);
+    sensores[protocolo::sensor_distancia]   = new QCheckBox("Distancia", this);
+    sensores[protocolo::sensor_infrarojo]   = new QCheckBox("Infrarojo", this);
 
     exceptions                              = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
@@ -97,7 +97,7 @@ void robot::processOrder(QString data){
             }
 
         }else
-            board->putData(QString(QString::fromLatin1("Error: he recibido información errónea: ") + data.toLatin1() + "\n").toLatin1());
+            board->putData(QString(QString::fromLatin1("Error[4]: he recibido información errónea: ") + data.toLatin1() + "\n").toLatin1());
     }else
         qDebug() << "Mensaje ya procesado: " << data;
 }
@@ -126,7 +126,7 @@ bool robot::setException(int exception_type, bool option){
         *queue_safe = true;
         return true;
     }else
-        qDebug() << "Error: No se pueden cambiar las excepeciones porque el comportamiento por defecto no es seguir instrucciones.";
+        qDebug() << "Error[5]: No se pueden cambiar las excepeciones porque el comportamiento por defecto no es seguir instrucciones.";
     return false;
 }
 

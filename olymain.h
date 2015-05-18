@@ -52,6 +52,7 @@ private slots:
     void stop();
     void openAbout();
     void recieveInformation();
+    void changeMessState();
 signals:
     void stopTimer();
 private:
@@ -73,6 +74,7 @@ private:
     bool            sender_safe;
     bool            queue_safe;
     QString         var;
+    bool            show_comming_info;
 
 };
 

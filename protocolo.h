@@ -110,6 +110,7 @@ public:
                 return Caracteres_tipo;
             break;
         }
+        return 0;
     }
 
     static bool verificacion(QByteArray data, int index){

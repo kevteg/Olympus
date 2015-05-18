@@ -1,9 +1,10 @@
 #include "console.h"
 
-Console::Console(QColor color_base, QColor color_text, QString nueva_linea, QWidget *parent): QPlainTextEdit(parent), localEchoEnabled(true){
+Console::Console(QColor color_base, QColor color_text, QString nueva_linea, bool localEchoEnabled, QWidget *parent): QPlainTextEdit(parent), localEchoEnabled(true){
     this->nueva_linea = QByteArray(nueva_linea.toLatin1());
     document()->setMaximumBlockCount(100);
     QPalette p = palette();
+    this->localEchoEnabled = localEchoEnabled;
     p.setColor(QPalette::Base, color_base);
     p.setColor(QPalette::Text, color_text);
     setPalette(p);
@@ -29,6 +30,7 @@ void Console::setLocalEchoEnabled(bool set){
 }
 
 void Console::keyPressEvent(QKeyEvent *e){
+
     switch (e->key()) {
     case Qt::Key_Backspace:
         break;
@@ -41,17 +43,35 @@ void Console::keyPressEvent(QKeyEvent *e){
     default:
         if(localEchoEnabled){
             QPlainTextEdit::keyPressEvent(e);
-            if(e->key() == Qt::Key_Return)
-                putData(nueva_linea);
+            if(e->key() == Qt::Key_Return){
+                executeCommand(QString::fromStdString(command.str()));
+                qDebug() << QString::fromStdString(command.str());
+                command.str(std::string());
+            }else
+                command << (char)e->key();
         }
-        if(e->key() != Qt::Key_Return)
-        emit getData(e->text().toLocal8Bit());
+        //if(e->key() != Qt::Key_Return)
+        //emit getData(e->text().toLocal8Bit());
 
     }
 }
+void Console::executeCommand(QString command){
+
+    if(command.toLower().contains("clc") || command.toLower().contains("clear"))
+        limpiar();
+    else if(command.toLower().contains("acerca") || command.toLower().contains("about"))
+        emit showAbout();
+    else if(command.toLower().contains("crs"))
+        emit changeMstate();
+    else if(command.toLower().contains("exit") || command.toLower().contains("salir"))
+        emit exitProgram();
+    else
+        putData("Error[0]: Comando desconocido\n");
+    putData(nueva_linea);
+}
+
 void Console::limpiar(){
     clear();
-    putData(nueva_linea);
 }
 
 void Console::mousePressEvent(QMouseEvent *e){

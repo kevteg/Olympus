@@ -4,30 +4,28 @@
 olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     ui->setupUi(this);
     int x = 0, y = 0;
-    terminal        = new Console(Qt::black, Qt::white, ">> ", this);
-    board           = new Console(Qt::lightGray, Qt::black, "> ", this);
-    options         = new QToolButton*[n_options];
-    string *botones = new string[n_options];
-    settings        = new preferencias(this);
-    serial          = new QSerialPort(this);
-    sender          = new messenger(serial);
-    swarm_object    = new swarm();
-    //Cola de mensajes que se irán guardando y enviando cada cierto tiempo
-    messages_queue  = new QQueue<QString>;
+    terminal                             = new Console(Qt::black, Qt::white, ">> ", true, this);
+    board                                = new Console(Qt::lightGray, Qt::black, "> ", false, this);
+    options                              = new QToolButton*[n_options];
+    string *botones                      = new string[n_options];
+    settings                             = new preferencias(this);
+    serial                               = new QSerialPort(this);
+    sender                               = new messenger(serial);
+    swarm_object                         = new swarm();
+    messages_queue                       = new QQueue<QString>;
+    show_comming_info                    = true;
+    sender_safe                          = true;
+    queue_safe                           = true;
+    var                                  = "";
 
-    sender_safe     = true;
-    queue_safe      = true;
-    var             = "";
-    botones[option_connect]        = string("Conectar");
-    botones[option_disconnect]     = string("Desconectar");
-    botones[option_stop]           = string("Detener");
-    botones[option_start]          = string("Iniciar");
-    botones[option_manual_control] = string("Control manual");
-    botones[option_exit]           = string("Salir");
+    botones[option_connect]              = string("Conectar");
+    botones[option_disconnect]           = string("Desconectar");
+    botones[option_stop]                 = string("Detener");
+    botones[option_start]                = string("Iniciar");
+    botones[option_manual_control]       = string("Control manual");
+    botones[option_exit]                 = string("Salir");
 
-    qDebug()<<"Hilo principal: "<<QThread::currentThreadId();
-    checker = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
-
+    checker                              = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
     QGroupBox *terminal_container        = new QGroupBox("Terminal", this);
     QGroupBox *board_container           = new QGroupBox("Pizarrón", this);
     QGroupBox *options_container         = new QGroupBox("Opciones", this);
@@ -35,9 +33,10 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QVBoxLayout *board_layout            = new QVBoxLayout();
     QGridLayout *internal_options_layout = new QGridLayout();
 
+    qDebug()<<"Hilo principal: "<<QThread::currentThreadId();
     if(!openPreFile()){
         QMessageBox messageBox;
-        messageBox.critical(0,"Error","Archivo de configuración no encontrado!");
+        messageBox.critical(0,"Error[1]","Archivo de configuración no encontrado!");
         messageBox.setFixedSize(500,200);
         exit(-1);
     }else{
@@ -99,8 +98,7 @@ void olymain::defaultSituation(){
     options[option_start]->setEnabled(false);
     options[option_stop]->setEnabled(false);
     options[option_manual_control]->setEnabled(false);
-    terminal->putData("Bienvenido a Olympus");
-    terminal->putData("\n");
+    terminal->putData("Bienvenido a Olympus\n");
 }
 void olymain::setConections(){
     /*Hilo*/
@@ -117,7 +115,16 @@ void olymain::setConections(){
     connect(ui->actionPreferencias, SIGNAL(triggered()), settings, SLOT(show()));
     connect(ui->actionSalir, SIGNAL(triggered()), this, SLOT(close()));
     connect(serial, SIGNAL(readyRead()), this, SLOT(recieveInformation()));
+    /*Console*/
+    connect(terminal, SIGNAL(showAbout()), this, SLOT(openAbout()));
+    connect(terminal, SIGNAL(changeMstate()), this, SLOT(changeMessState()));
+    connect(terminal, SIGNAL(exitProgram()), this, SLOT(close()));
+
 }
+void olymain::changeMessState(){
+    show_comming_info = !show_comming_info;
+}
+
 void olymain::connection(){
     preferencias::preferencia opt = settings->Preferencia();
     if(sender->createConnection(opt)){
@@ -126,6 +133,7 @@ void olymain::connection(){
         options[option_start]->setEnabled(true);
         ui->statusBar->showMessage(tr("Conectado correctamente a: %1 : %2").arg(opt.nombre).arg(opt.stringBaudRate));
     }else{
+        terminal->putData(QString("Error[2]: Problemas con el puerto").toLatin1());
         QMessageBox::critical(this, tr("Error con el puerto seleccionado"), serial->errorString());
         ui->statusBar->showMessage(tr("Error al abrir serial"));
     }
@@ -182,10 +190,12 @@ void olymain::recieveInformation(){
 
        if(protocolo::verificacion(rec.toLatin1(), 0)){
            robot_name = swarm_object->sendData(rec.toLatin1());
-           if(robot_name != "err")
-               terminal->putData(QString("Se recibe: " + QString(rec) + " de " + robot_name + "\n").toLatin1());
-           else
-               terminal->putData(QString("Mensaje: " + QString(rec) + QString::fromLatin1(" está dañado, no cumple con el protocolo\n")).toLatin1());
+           if(show_comming_info){
+               if(robot_name != "err")
+                   terminal->putData(QString("Se recibe: " + QString(rec) + " de " + robot_name + "\n").toLatin1());
+               else
+                   terminal->putData(QString("Error[3]: Mensaje: " + QString(rec) + QString::fromLatin1(" está dañado, no cumple con el protocolo\n")).toLatin1());
+           }
        }
        sender_safe = true;
    }
