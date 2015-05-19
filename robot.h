@@ -36,6 +36,8 @@ public:
     char getBehave();
     /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
     void find();
+    void operator<<(QString behave);
+    void operator<<(int behave);
     ~robot();
 private:
     QVBoxLayout      *things_layout;

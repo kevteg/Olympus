@@ -12,6 +12,7 @@ vector<robot*> *swarm::getRobots(){
 }
 
 QString swarm::sendData(QByteArray data){
+
     QString name = "err";
     /*Si el mensaje no cumple el protocolo o si no existe el robot se envia err*/
     if(protocolo::verificacion(data, 0))

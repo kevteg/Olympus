@@ -71,6 +71,12 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         setConections();
         defaultSituation();
     }
+    /*string _first_m;
+    _first_m = protocolo::excepcion;
+    _first_m += protocolo::sensor_distancia;
+    _first_m += '0';
+    (*swarm_object->getRobots()->at(0)) << QString::fromStdString(_first_m);
+    (*swarm_object->getRobots()->at(0)) << 1;*/
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -173,7 +179,7 @@ void olymain::recieveInformation(){
        QByteArray data = serial->readAll();
 
        var += data;
-       qDebug() << var;
+       //qDebug() << var;
        if(var.contains(protocolo::delimitador_f, Qt::CaseInsensitive)){
             index_1 = var.size() - 1;
             while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_f)
@@ -184,7 +190,7 @@ void olymain::recieveInformation(){
                 index_2++;
             rec = var.mid(index_2, (index_1 - index_2 + 1));
 
-            qDebug() << "REC: " << rec;
+            //qDebug() << "REC: " << rec;
             var = "";
        }
 

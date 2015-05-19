@@ -30,33 +30,31 @@ void Console::setLocalEchoEnabled(bool set){
 }
 
 void Console::keyPressEvent(QKeyEvent *e){
-
     switch (e->key()) {
-    case Qt::Key_Backspace:
-        break;
-    case Qt::Key_Left:
-    case Qt::Key_Right:
-    case Qt::Key_Up:
-    case Qt::Key_Down:
-        getFlechas(e);
-        break;
-    default:
-        if(localEchoEnabled){
-            QPlainTextEdit::keyPressEvent(e);
-            if(e->key() == Qt::Key_Return){
-                executeCommand(QString::fromStdString(command.str()));
-                qDebug() << QString::fromStdString(command.str());
-                command.str(std::string());
-            }else
-                command << (char)e->key();
-        }
-        //if(e->key() != Qt::Key_Return)
-        //emit getData(e->text().toLocal8Bit());
-
+        case Qt::Key_Backspace:
+            break;
+        case Qt::Key_Left:
+        case Qt::Key_Right:
+        case Qt::Key_Up:
+        case Qt::Key_Down:
+            getFlechas(e);
+            break;
+        default:
+            if(localEchoEnabled){
+                QPlainTextEdit::keyPressEvent(e);
+                if(e->key() == Qt::Key_Return){
+                    putData(nueva_linea);
+                    executeCommand(QString::fromStdString(command.str()));
+                    qDebug() << QString::fromStdString(command.str());
+                    command.str(std::string());
+                }else
+                    command << (char)e->key();
+            }
+            //if(e->key() != Qt::Key_Return)
+            //emit getData(e->text().toLocal8Bit());
     }
 }
 void Console::executeCommand(QString command){
-
     if(command.toLower().contains("clc") || command.toLower().contains("clear"))
         limpiar();
     else if(command.toLower().contains("acerca") || command.toLower().contains("about"))
@@ -67,11 +65,11 @@ void Console::executeCommand(QString command){
         emit exitProgram();
     else
         putData("Error[0]: Comando desconocido\n");
-    putData(nueva_linea);
 }
 
 void Console::limpiar(){
     clear();
+    putData(nueva_linea);
 }
 
 void Console::mousePressEvent(QMouseEvent *e){

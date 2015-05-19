@@ -107,6 +107,12 @@ bool robot::getException(int exception_tipe){
 void robot::setBehave(string new_behave){
 
 }
+void robot::operator<<(QString behave){
+    qDebug() << behave;
+}
+void robot::operator<<(int behave){
+    qDebug() << behave;
+}
 bool robot::setException(int exception_type, bool option){
     qDebug() << this->behave[_main] ;
     if(this->behave[_main] == protocolo::Seguir_instruccion
