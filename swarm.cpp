@@ -18,7 +18,7 @@ QString swarm::sendData(QByteArray data){
     if(protocolo::verificacion(data, 0))
         for(vector<robot*>::iterator r = robots->begin(); r != robots->end(); ++r)
            if((*r)->getIdentificator() == data.at(1)){
-               (*r)->processOrder(QString(data));
+               *(*r) << QString::fromLatin1(data);
                name = (*r)->getName();
            }
     return name;

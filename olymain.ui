@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>Olympus</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">button:hover{
+	background-color=yellow;
+}</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="controls_container">
     <property name="enabled">
@@ -21,9 +26,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>10</y>
-      <width>1371</width>
-      <height>341</height>
+      <y>0</y>
+      <width>651</width>
+      <height>691</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -35,6 +40,9 @@
     <property name="autoFillBackground">
      <bool>true</bool>
     </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
     <property name="title">
      <string>Sala de control</string>
     </property>
@@ -43,7 +51,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>671</width>
+       <width>631</width>
        <height>311</height>
       </rect>
      </property>
@@ -52,55 +60,46 @@
     <widget class="QWidget" name="horizontalLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>700</x>
-       <y>20</y>
-       <width>661</width>
+       <x>10</x>
+       <y>340</y>
+       <width>631</width>
        <height>311</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="options_layout"/>
     </widget>
-    <zorder>horizontalLayoutWidget_2</zorder>
-    <zorder>horizontalLayoutWidget_3</zorder>
-    <zorder>line</zorder>
    </widget>
    <widget class="QGroupBox" name="robots_container">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>360</y>
-      <width>1371</width>
-      <height>331</height>
+      <x>660</x>
+      <y>0</y>
+      <width>701</width>
+      <height>691</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color = 
+color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4, 255), stop:0.085 rgba(2, 79, 0, 255), stop:0.19 rgba(50, 147, 22, 255), stop:0.275 rgba(236, 191, 49, 255), stop:0.39 rgba(243, 61, 34, 255), stop:0.555 rgba(135, 81, 60, 255), stop:0.667 rgba(121, 75, 255, 255), stop:0.825 rgba(164, 255, 244, 255), stop:0.885 rgba(104, 222, 71, 255), stop:1 rgba(93, 128, 0, 255));</string>
     </property>
     <property name="title">
      <string>Robots</string>
     </property>
-    <widget class="QWidget" name="horizontalLayoutWidget">
+    <widget class="QWidget" name="formLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>1371</width>
-       <height>291</height>
+       <x>10</x>
+       <y>20</y>
+       <width>681</width>
+       <height>651</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="robots_layout"/>
+     <layout class="QFormLayout" name="robots_layout"/>
     </widget>
    </widget>
-   <widget class="Line" name="line">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>350</y>
-      <width>1371</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
+   <zorder>controls_container</zorder>
+   <zorder>robots_container</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

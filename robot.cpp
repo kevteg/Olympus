@@ -20,11 +20,11 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions                              = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
-    things_layout                           = new QVBoxLayout;
+    things_layout                           = new QHBoxLayout;
     actual_behavior                         = new QLabel("Comportamiento", this);
     exceptions_group                        = new QGroupBox("Exepciones", this);
 
-    things_layout->addSpacing(2);
+    //things_layout->addSpacing(2);
     exceptions_group->setStyleSheet(" QGroupBox{ background-color:transparent; color: black; font: 10pt ;font: bold; text-align:center;}");
     sensores[protocolo::sensor_infrarojo]->setStyleSheet("QCheckBox{color: black; font: 10pt}"); //Para que se siga viendo oscuro después de desabilitar
     sensores[protocolo::sensor_distancia]->setStyleSheet("QCheckBox{color: black; font: 10pt}");
@@ -35,6 +35,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions_layout->addWidget(sensores[protocolo::sensor_infrarojo]);
     exceptions_layout->addWidget(sensores[protocolo::sensor_distancia]);
     exceptions_group->setLayout(exceptions_layout);
+
     things_layout->addWidget(board);
     things_layout->addWidget(exceptions_group);
     things_layout->addWidget(actual_behavior);
@@ -58,7 +59,8 @@ QString robot::getName(){
 char robot::getIdentificator(){
     return identificator;
 }
-void robot::processOrder(QString data){
+void robot::operator<<(QString data){
+    /*El operador se usa para procesar los mensajes que se van enviando*/
     if(data != old_m){
         qDebug() << "Procesando: " << data;
         old_m = data;
@@ -104,16 +106,78 @@ void robot::processOrder(QString data){
 bool robot::getException(int exception_tipe){
     return exceptions[exception_tipe];
 }
-void robot::setBehave(string new_behave){
-
+bool robot::changeOptions(char behave){
+    string message;
+    message = protocolo::delimitador_i;
+    message += this->identificator;
+    message += protocolo::separador;
+    switch(behave){
+        case protocolo::Explorar:
+            message += protocolo::Explorar;
+        break;
+        case protocolo::Evadir:
+            message += protocolo::Evadir;
+        break;
+        case protocolo::Seguir_instruccion:
+            message += protocolo::Evadir;
+        break;
+        case protocolo::Detener:
+            message += protocolo::Detener;
+        break;
+        case protocolo::buscar:
+            message += protocolo::buscar;
+        break;
+        default:
+            qDebug() << "Error[6]: Opción errónea. No se ha cambiado nada";
+            return false;
+        break;
+    }
+    message = protocolo::delimitador_f;
+    *queue_safe = false;
+    messages_queue->enqueue(QString().fromStdString(message));
+    *queue_safe = true;
+    return true;
 }
-void robot::operator<<(QString behave){
-    qDebug() << behave;
+bool robot::changeOptions(char behave, char option_1){
+    string message;
+    message = protocolo::delimitador_i;
+    message += this->identificator;
+    message += protocolo::separador;
+    switch(behave){
+        case protocolo::Seguir_instruccion:
+            message += protocolo::Evadir;
+            message += protocolo::separador;
+            switch(option_1){
+                case protocolo::adelante:
+                    message += protocolo::adelante;
+                break;
+                case protocolo::atras:
+                    message += protocolo::atras;
+                break;
+                case protocolo::derecha:
+                    message += protocolo::derecha;
+                break;
+                case protocolo::izquierda:
+                    message += protocolo::izquierda;
+                break;
+                default:
+                    qDebug() << "Error[7]: Opción errónea. Seguir instrucciones no posee esa instrucción";
+                    return false;
+                break;
+            }
+        break;
+        default:
+            qDebug() << "Error[8]: Opción errónea. Seguir instrucciones es el único comportamiento con mas opciones";
+            return false;
+        break;
+    }
+    message = protocolo::delimitador_f;
+    *queue_safe = false;
+    messages_queue->enqueue(QString().fromStdString(message));
+    *queue_safe = true;
+    return true;
 }
-void robot::operator<<(int behave){
-    qDebug() << behave;
-}
-bool robot::setException(int exception_type, bool option){
+bool robot::changeOptions(int exception_type, bool option){
     qDebug() << this->behave[_main] ;
     if(this->behave[_main] == protocolo::Seguir_instruccion
        && (exception_type == protocolo::sensor_distancia || exception_type == protocolo::sensor_infrarojo)){
@@ -123,7 +187,7 @@ bool robot::setException(int exception_type, bool option){
         message += protocolo::separador;
         message += protocolo::excepcion;
         message += protocolo::separador;
-        message += exception_type + 48;
+        message += exception_type + 48; //Para llevarlo a char
         message += protocolo::separador;
         message += option?'1':'0';
         message += protocolo::delimitador_f;
@@ -132,7 +196,7 @@ bool robot::setException(int exception_type, bool option){
         *queue_safe = true;
         return true;
     }else
-        qDebug() << "Error[5]: No se pueden cambiar las excepeciones porque el comportamiento por defecto no es seguir instrucciones.";
+        qDebug() << "Error[5]: No se pueden cambiar las excepciones porque el comportamiento por defecto no es seguir instrucciones.";
     return false;
 }
 

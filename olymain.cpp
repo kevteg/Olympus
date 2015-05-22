@@ -75,8 +75,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     _first_m = protocolo::excepcion;
     _first_m += protocolo::sensor_distancia;
     _first_m += '0';
-    (*swarm_object->getRobots()->at(0)) << QString::fromStdString(_first_m);
-    (*swarm_object->getRobots()->at(0)) << 1;*/
+    (*swarm_object->getRobots()->at(0)) << QString::fromStdString(_first_m);*/
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/

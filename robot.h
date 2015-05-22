@@ -3,7 +3,7 @@
 #include <QGroupBox>
 #include <QtCore/QDebug>
 #include <console.h>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLabel>
 #include <iostream>
@@ -26,21 +26,23 @@ public:
     //0 ultra, 1 infra
     bool getException(int exception_tipe);
     /*Se ejecuta la instrucción que llega*/
-    void processOrder(QString data);
+    void operator<<(QString data);
     /*Se cambia el comportamiento actual, NOTA: si es alguno de los comportamientos definidos en seguir instrucciones el comportamiento cambia automaticamente*/
-    void setBehave(string new_behave);
+    void setBehave(char behave);
     /*Es necesario estar en modo de seguir instrucciones*/
-    /*Si la pudo cambiar retorna true, si no esta en el modo correcto o hay algo mal con exception_type retornará false*/
-    bool setException(int exception_type, bool option);
+
     /*Retorna el comportamiento actual*/
-    char getBehave();
+    bool changeOptions(char behave);
+    bool changeOptions(char behave, char option_1);
+    /*Si la pudo cambiar retorna true, si no esta en el modo correcto o hay algo mal con exception_type retornará false*/
+    bool changeOptions(int exception_type, bool option);
+
     /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
     void find();
-    void operator<<(QString behave);
-    void operator<<(int behave);
+    //void operator<<(char *a);
     ~robot();
 private:
-    QVBoxLayout      *things_layout;
+    QHBoxLayout      *things_layout;
     Console          *board; //Las consolas se usarán como pizarrones
     QGroupBox        *exceptions_group;
     QCheckBox        **sensores;
