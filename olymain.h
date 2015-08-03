@@ -18,14 +18,13 @@
 #include "verifytime.h"
 #include "swarm.h"
 
-#define option_connect        0
-#define option_disconnect     1
-#define option_start          2
-#define option_stop           3
-#define option_manual_control 4
-#define option_exit           5
+#define option_connect_disconnect 0
+#define option_start_stop         1
+#define option_preferences        2
+#define option_about              3
+#define option_exit               4
 
-#define n_options 6
+#define n_options 5
 using namespace std;
 
 
@@ -44,12 +43,13 @@ public:
     ~olymain();
     void setConections();
     void defaultSituation();
-private slots:
-
     void connection();
     void disconnection();
     void begin();
     void stop();
+private slots:
+    void connect_serial();
+    void robotRutine();
     void openAbout();
     void recieveInformation();
     void changeMessState();
@@ -73,6 +73,8 @@ private:
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
     bool            sender_safe;
     bool            queue_safe;
+    bool            serial_connection;
+    bool            rutine_robots;
     QString         var;
     bool            show_comming_info;
 

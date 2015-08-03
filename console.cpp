@@ -8,10 +8,14 @@ Console::Console(QColor color_base, QColor color_text, QString nueva_linea, bool
     p.setColor(QPalette::Base, color_base);
     p.setColor(QPalette::Text, color_text);
     setPalette(p);
+
+
     if(nueva_linea != ">>")
-        this->setStyleSheet(" margin-top: 7px; border: 2px solid black; border-radius: 3px; ");
+        this->setStyleSheet("margin-top: 3px; border: 0px \
+                            solid black; border-radius: 3px;");
     else
-        this->setStyleSheet(" margin-top: 7px; border: 2px solid white; border-radius: 3px; ");
+        this->setStyleSheet("margin-top: 3px; border: 0px \
+                            solid white; border-radius: 3px; ");
     putData(this->nueva_linea);
 
 }

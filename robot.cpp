@@ -13,7 +13,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     this->behave[_main] = none;
     this->behave[secondary] = none;
 
-    sensores = new QCheckBox*[protocolo::numero_excepciones] ;
+    sensores                                = new QCheckBox*[protocolo::numero_excepciones] ;
     sensores[protocolo::sensor_distancia]   = new QCheckBox("Distancia", this);
     sensores[protocolo::sensor_infrarojo]   = new QCheckBox("Infrarojo", this);
 
@@ -22,7 +22,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions[protocolo::sensor_infrarojo] = false;
     things_layout                           = new QHBoxLayout;
     actual_behavior                         = new QLabel("Comportamiento", this);
-    exceptions_group                        = new QGroupBox("Exepciones", this);
+    exceptions_group                        = new QGroupBox("Sensores", this);
 
     //things_layout->addSpacing(2);
     exceptions_group->setStyleSheet(" QGroupBox{ background-color:transparent; color: black; font: 10pt ;font: bold; text-align:center;}");

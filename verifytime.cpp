@@ -24,7 +24,7 @@ void verifyTime::onTimeout(){
            robot_name = swarm_object->sendData(mensaje.toLatin1());
            /*Antes de enviar se verifica que lo que este en la cola. Si esta bien el mensaje se envia*/
            if(robot_name != "err"){
-                sender->sendMessage(mensaje.toLatin1());
+                //sender->sendMessage(mensaje.toLatin1());
                 terminal->putData(QString(QString::fromLatin1("Se envía: ") + mensaje + " a " + (robot_name.toLatin1()) + "\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{

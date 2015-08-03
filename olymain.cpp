@@ -3,9 +3,8 @@
 
 olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     ui->setupUi(this);
-    int x = 0, y = 0;
     terminal                             = new Console(Qt::black, Qt::white, ">> ", true, this);
-    board                                = new Console(Qt::lightGray, Qt::black, "> ", false, this);
+    board                                = new Console(Qt::white, Qt::black, "> ", false, this);
     options                              = new QToolButton*[n_options];
     string *botones                      = new string[n_options];
     settings                             = new preferencias(this);
@@ -18,64 +17,180 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     queue_safe                           = true;
     var                                  = "";
 
-    botones[option_connect]              = string("Conectar");
-    botones[option_disconnect]           = string("Desconectar");
-    botones[option_stop]                 = string("Detener");
-    botones[option_start]                = string("Iniciar");
-    botones[option_manual_control]       = string("Control manual");
+    botones[option_connect_disconnect]   = string("Conectar/Desconectar");
+    botones[option_start_stop]           = string("Iniciar/detener");
+    botones[option_preferences]          = string("Preferencias");
+    botones[option_about]                = string("Acerca de");
     botones[option_exit]                 = string("Salir");
 
     checker                              = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
-    QGroupBox *terminal_container        = new QGroupBox("Terminal", this);
-    QGroupBox *board_container           = new QGroupBox("Pizarrón", this);
-    QGroupBox *options_container         = new QGroupBox("Opciones", this);
+    QGroupBox *board_container           = new QGroupBox("", this);
+    QGroupBox *terminal_container        = new QGroupBox("", this);
+    QGroupBox *options_container         = new QGroupBox("", this);
+    QGroupBox *info_container            = new QGroupBox("", this);
+    serial_connection                    = false;
+    rutine_robots                        = false;
+
+    for (int i = 0; i < n_options; i++) {
+        stringstream numero;
+        numero << i;
+        options[i] = new QToolButton(this);
+        string dir = string(":/images/Imagenes/") + numero.str() + string(".png");
+        options[i]->setIcon(QIcon(QString::fromStdString(dir)));
+
+        if(i < 2){
+            options[i]->setIconSize(QSize(100, 100));
+            options[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            options[i]->setStyleSheet("QToolButton {\
+                                      border-radius: 50%;\
+                                      width: 200px;\
+                                      height: 100px;\
+                                      position: centered;} \
+                                      QToolButton:pressed { \
+                                      background-color: rgb(67, 97, 102);\
+            }");
+        }else{
+            options[i]->setIconSize(QSize(30, 30));
+            options[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            options[i]->setStyleSheet("QToolButton {\
+                                      border-radius: 1%;\
+                                      background: rgb(52, 77, 77);\
+                                      width: 50px;\
+                                      height: 50px;\
+                                      position: centered;} \
+                                      QToolButton:pressed { \
+                                      background-color: rgb(68, 88, 90);\
+            }");
+        }
+    }
+
+
+    terminal_container->setStyleSheet("QGroupBox{\
+                     background: rgb(212, 212, 212); }\
+                    QGroupBox::title{ subcontrol-origin: margin;\
+                    subcontrol-position: top center;} \
+                    QGroupBox { margin-top: 7px; border: 0px \
+                    solid black; border-radius: 3px; }");
+
+    board_container->setStyleSheet("QGroupBox{\
+                     background: rgb(62, 70, 81); } \
+                    QGroupBox::title{ subcontrol-origin: margin;\
+                    subcontrol-position: top center;} \
+                    QGroupBox { margin-top: 7px; border: 0px \
+                    solid black; border-radius: 3px; }");
+
+   options_container->setStyleSheet("QGroupBox{\
+                     background: rgb(58, 84, 88);  } \
+                    QGroupBox::title{ subcontrol-origin: margin;\
+                    subcontrol-position: top center;} \
+                    QGroupBox { margin-top: 7px; border: 0px \
+                    solid black; border-radius: 3px; }");
+    info_container->setStyleSheet("QGroupBox{\
+                      background: rgb(94, 108, 125);  } \
+                     QGroupBox::title{ subcontrol-origin: margin;\
+                     subcontrol-position: top center;} \
+                     QGroupBox { margin-top: 7px; border: 0px \
+                     solid black; border-radius: 3px; }");
+
+
+    QFont f( "Adec", 14, QFont::Normal);
+
+    QLabel *terminal_titulo = new QLabel(this);
+    terminal_titulo->setText("CONSOLA");
+    terminal_titulo->setFont(f);
+    terminal_titulo->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    terminal_titulo->setAlignment(Qt::AlignCenter);
+
+    QLabel *pizarron_titulo = new QLabel(this);
+    pizarron_titulo->setText("PIZARRÓN");
+    pizarron_titulo->setFont(f);
+    pizarron_titulo->setStyleSheet("QLabel {color : rgb(238, 238, 238); }");
+    pizarron_titulo->setAlignment(Qt::AlignCenter);
+
+    QLabel *opciones_titulos[3];
+    for (int i = 0; i < 3; i++) {
+        opciones_titulos[i] = new QLabel(this);
+        opciones_titulos[i]->setFont(f);
+        opciones_titulos[i]->setStyleSheet("QLabel {color: rgb(236, 240, 241); }");
+        opciones_titulos[i]->setAlignment(Qt::AlignCenter);
+    }
+    opciones_titulos[0]->setText("OPCIONES");
+    opciones_titulos[1]->setText("CONEXIÓN SERIAL");
+    opciones_titulos[2]->setText("RUTINAS DE ROBOTS");
+
     QVBoxLayout *terminal_layout         = new QVBoxLayout();
     QVBoxLayout *board_layout            = new QVBoxLayout();
-    QGridLayout *internal_options_layout = new QGridLayout();
+    QVBoxLayout *internal_options_layout = new QVBoxLayout();
+    QHBoxLayout *more_options_layout     = new QHBoxLayout();
 
-    qDebug()<<"Hilo principal: "<<QThread::currentThreadId();
+    qDebug() << "Hilo principal: " << QThread::currentThreadId();
     if(!openPreFile()){
         QMessageBox messageBox;
         messageBox.critical(0,"Error[1]","Archivo de configuración no encontrado!");
         messageBox.setFixedSize(500,200);
         exit(-1);
     }else{
+        terminal_layout->addWidget(terminal_titulo);
         terminal_layout->addWidget(terminal);
-        board_layout->addWidget(board);
         terminal_container->setLayout(terminal_layout);
+
+        board_layout->addWidget(pizarron_titulo);
+        board_layout->addWidget(board);
         board_container->setLayout(board_layout);
+
+        internal_options_layout->setAlignment(Qt::AlignHCenter);
+        internal_options_layout->addWidget(opciones_titulos[0]);
+        internal_options_layout->addWidget(opciones_titulos[1]);
+        internal_options_layout->addWidget(options[0]);
+        internal_options_layout->addWidget(opciones_titulos[2]);
+        internal_options_layout->addWidget(options[1]);
+
+        more_options_layout->addWidget(options[2]);
+        more_options_layout->addWidget(options[3]);
+        more_options_layout->addWidget(options[4]);
+        internal_options_layout->addLayout(more_options_layout);
+
         options_container->setLayout(internal_options_layout);
 
-        ui->robots_container->setStyleSheet("QGroupBox{ background: rgb(159, 159, 159); color: black; font: 11pt ;font: bold;   } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top center;} QGroupBox { margin-top: 7px; border: 2px solid black; border-radius: 3px; }");
-        ui->controls_container->setStyleSheet("QGroupBox{ background: rgb(159, 159, 159);color: black; font: 11pt ;font: bold;   } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top center;} QGroupBox { margin-top: 7px; border: 2px solid black; border-radius: 3px; }");
-        ui->control_layout->setDirection(QBoxLayout::RightToLeft);
-        ui->control_layout->addWidget(board_container);
+        ui->robots_container->setStyleSheet("QGroupBox{\
+                                             background: rgb(239, 242, 242); \
+                                            color: black; font: 11pt ;font: bold;   } \
+                                            QGroupBox::title{ subcontrol-origin: margin;\
+                                            subcontrol-position: top center;} \
+                                            QGroupBox { margin-top: 7px; border: 0px \
+                                            solid black; border-radius: 0px; }");
+
+        ui->controls_container->setStyleSheet("QGroupBox{\
+                                              background: rgb(239, 242, 242); \
+                                             color: black; font: 11pt ;font: bold;   } \
+                                             QGroupBox::title{ subcontrol-origin: margin;\
+                                             subcontrol-position: top center;} \
+                                             QGroupBox { margin-top: 7px; border: 0px \
+                                             solid black; border-radius: 0px; }");
+
+        ui->control_layout->setDirection(QVBoxLayout::TopToBottom);
         ui->control_layout->addWidget(terminal_container);
+        ui->control_layout->addWidget(board_container);
+        ui->info_Layout->addWidget(info_container);
         ui->options_layout->addWidget(options_container);
-        /*Para agregar las opciones de manera dinámica*/
-        for (int index = 0; index < n_options; index++) {
-            stringstream numero;
-            if(index > 2){
-                x = 1;
-                y = index - 3;
-            }
-            numero << index;
-            string dir = string(":/images/Imagenes/") + numero.str() + string(".png");
-            options[index] = new QToolButton(this);
-            options[index]->setIcon(QIcon(QString::fromStdString(dir)));
-            options[index]->setIconSize(QSize(100, 100));
-            options[index]->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-            options[index]->setText(QString::fromStdString(botones[index]));
-            internal_options_layout->addWidget(options[index], x, (index > 2)?y:index);
-        }
         setConections();
         defaultSituation();
     }
+        QPalette p = ui->statusBar->palette();
+        p.setColor( QPalette::Background, QColor(1, 152, 117));
+        p.setColor(QPalette::Text, Qt::white);
+        ui->statusBar->setPalette(p);
+        ui->statusBar->setAutoFillBackground(true);
+
     /*string _first_m;
-    _first_m = protocolo::excepcion;
-    _first_m += protocolo::sensor_distancia;
-    _first_m += '0';
+    _first_m = protocolo::delimitador_i;
+    _first_m += 'A';
+    _first_m += protocolo::separador;
+    _first_m += protocolo::Explorar;
+    _first_m += protocolo::delimitador_f;
     (*swarm_object->getRobots()->at(0)) << QString::fromStdString(_first_m);*/
+
+    //swarm_object->sendData(QString::fromStdString(_first_m).toLatin1());
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -99,10 +214,7 @@ bool olymain::openPreFile(){
     return true;
 }
 void olymain::defaultSituation(){
-    options[option_disconnect]->setEnabled(false);
-    options[option_start]->setEnabled(false);
-    options[option_stop]->setEnabled(false);
-    options[option_manual_control]->setEnabled(false);
+    options[option_start_stop]->setEnabled(false);
     terminal->putData("Bienvenido a Olympus\n");
 }
 void olymain::setConections(){
@@ -111,14 +223,10 @@ void olymain::setConections(){
     connect(&thread, SIGNAL(finished()), &timer, SLOT(stop()));
     /*Opciones*/
     connect(options[option_exit], SIGNAL(clicked()), this, SLOT(close()));
-    connect(options[option_connect], SIGNAL(clicked()), this, SLOT(connection()));
-    connect(options[option_disconnect], SIGNAL(clicked()), this, SLOT(disconnection()));
-    connect(options[option_start], SIGNAL(clicked()), this, SLOT(begin()));
-    connect(options[option_stop], SIGNAL(clicked()), this, SLOT(stop()));
-    /*Preferencias*/
-    connect(ui->actionAcerca_de_Olympus, SIGNAL(triggered()), this, SLOT(openAbout()));
-    connect(ui->actionPreferencias, SIGNAL(triggered()), settings, SLOT(show()));
-    connect(ui->actionSalir, SIGNAL(triggered()), this, SLOT(close()));
+    connect(options[option_connect_disconnect], SIGNAL(clicked()), this, SLOT(connect_serial()));
+    connect(options[option_start_stop], SIGNAL(clicked()), this, SLOT(robotRutine()));
+    connect(options[option_preferences], SIGNAL(clicked()), settings, SLOT(show()));
+    connect(options[option_about], SIGNAL(clicked()), this, SLOT(openAbout()));
     connect(serial, SIGNAL(readyRead()), this, SLOT(recieveInformation()));
     /*Console*/
     connect(terminal, SIGNAL(showAbout()), this, SLOT(openAbout()));
@@ -130,12 +238,20 @@ void olymain::changeMessState(){
     show_comming_info = !show_comming_info;
 }
 
+void olymain::connect_serial(){
+    serial_connection = !serial_connection;
+    if(serial_connection){
+        connection();
+    }else
+        disconnection();
+}
 void olymain::connection(){
     preferencias::preferencia opt = settings->Preferencia();
     if(sender->createConnection(opt)){
-        options[option_connect]->setEnabled(false);
-        options[option_disconnect]->setEnabled(true);
-        options[option_start]->setEnabled(true);
+        /*Cambiar al icono de desconeccion*/
+        string dir = string(":/images/Imagenes/00.png");
+        options[option_connect_disconnect]->setIcon(QIcon(QString::fromStdString(dir)));
+        options[option_start_stop]->setEnabled(true);
         ui->statusBar->showMessage(tr("Conectado correctamente a: %1 : %2").arg(opt.nombre).arg(opt.stringBaudRate));
     }else{
         terminal->putData(QString("Error[2]: Problemas con el puerto").toLatin1());
@@ -145,24 +261,30 @@ void olymain::connection(){
 }
 void olymain::disconnection(){
     sender->breakConnection();
-    options[option_connect]->setEnabled(true);
-    options[option_disconnect]->setEnabled(false);
-    options[option_manual_control]->setEnabled(false);
-    options[option_start]->setEnabled(false);
-    options[option_stop]->setEnabled(false);
+    /*Icono a conectar*/
+    string dir = string(":/images/Imagenes/0.png");
+    options[option_connect_disconnect]->setIcon(QIcon(QString::fromStdString(dir)));
+    options[option_start_stop]->setEnabled(false);
+}
+void olymain::robotRutine(){
+    rutine_robots = !rutine_robots;
+    if(rutine_robots)
+        begin();
+    else
+        stop();
 }
 void olymain::begin(){
     timer.start(500);
     timer.moveToThread(&thread);
     thread.start();
-    options[option_manual_control]->setEnabled(manual_control);
-    options[option_start]->setEnabled(false);
-    options[option_stop]->setEnabled(true);
+    //thread.signal
+    string dir = string(":/images/Imagenes/11.png");
+    options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
 }
 void olymain::stop(){
-    options[option_manual_control]->setEnabled(false);
-    options[option_start]->setEnabled(true);
-    options[option_stop]->setEnabled(false);
+    timer.stop();
+    string dir = string(":/images/Imagenes/1.png");
+    options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
 }
 void olymain::openAbout(){
     QMessageBox::about(this, tr("Acerca de Olympus 3"),
