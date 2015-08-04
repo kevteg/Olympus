@@ -68,7 +68,7 @@
        <x>250</x>
        <y>40</y>
        <width>321</width>
-       <height>641</height>
+       <height>651</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="control_layout"/>
@@ -79,7 +79,7 @@
        <x>10</x>
        <y>440</y>
        <width>221</width>
-       <height>241</height>
+       <height>251</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="info_Layout"/>
@@ -101,16 +101,16 @@ color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4,
     <property name="title">
      <string/>
     </property>
-    <widget class="QWidget" name="formLayoutWidget">
+    <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>0</x>
        <y>40</y>
        <width>781</width>
        <height>651</height>
       </rect>
      </property>
-     <layout class="QFormLayout" name="robots_layout"/>
+     <layout class="QGridLayout" name="robots_layout"/>
     </widget>
    </widget>
   </widget>
@@ -120,7 +120,7 @@ color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4,
      <x>0</x>
      <y>0</y>
      <width>1373</width>
-     <height>24</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

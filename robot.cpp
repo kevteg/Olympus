@@ -2,13 +2,17 @@
 /*TODO: Una guía del protocolo*/
 robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox(name, parent){
     board = new Console(Qt::lightGray, Qt::black, "> ", false, this);
-    this->setStyleSheet("QGroupBox{ background: qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop:0 #006666, stop: 1 #FFFFFF); color: black; font: 10pt ;font: bold; text-align:center;   } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top left;}");
+    this->setStyleSheet("QGroupBox{ background: rgb(0,255,0);}QGroupBox::indicator {\
+                      } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top left;}");
     this->name = name;
     this->identificator = identificator;
     this->behave = new char[n_behaves];
     this->sender_safe = sender_safe;
     this->queue_safe = queue_safe;
     this->messages_queue = messages_queue;
+
+    this->setFixedWidth(370);
+    this->setFixedHeight(200);
     /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
     this->behave[_main] = none;
     this->behave[secondary] = none;
@@ -25,7 +29,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions_group                        = new QGroupBox("Sensores", this);
 
     //things_layout->addSpacing(2);
-    exceptions_group->setStyleSheet(" QGroupBox{ background-color:transparent; color: black; font: 10pt ;font: bold; text-align:center;}");
+    exceptions_group->setStyleSheet(" QGroupBox{ background-color:rgb(0); color: black; font: 10pt ;font: bold; text-align:center;}");
     sensores[protocolo::sensor_infrarojo]->setStyleSheet("QCheckBox{color: black; font: 10pt}"); //Para que se siga viendo oscuro después de desabilitar
     sensores[protocolo::sensor_distancia]->setStyleSheet("QCheckBox{color: black; font: 10pt}");
     actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");

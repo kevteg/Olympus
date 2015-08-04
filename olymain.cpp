@@ -124,6 +124,9 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QHBoxLayout *more_options_layout     = new QHBoxLayout();
 
     qDebug() << "Hilo principal: " << QThread::currentThreadId();
+
+    //ui->robots_layout->setAlignment(Qt::AlignLeft);
+    ui->robots_layout->setSpacing(15);
     if(!openPreFile()){
         QMessageBox messageBox;
         messageBox.critical(0,"Error[1]","Archivo de configuración no encontrado!");
@@ -197,12 +200,17 @@ bool olymain::openPreFile(){
    string line;
    int index = 0;
     ifstream pre("conf.oly");
+    int x = 0, y = 0;
     if(pre.is_open()){
         while(getline(pre, line)){
             if(line[0] == protocolo::delimitador_f){
                 QString nombre = QString::fromStdString(line.substr(5));
                 swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[3], messages_queue, &queue_safe, this));
-                ui->robots_layout->addWidget(swarm_object->getRobots()->at(index++));
+                ui->robots_layout->addWidget(swarm_object->getRobots()->at(index++), x, y++);
+                if(y > 1){
+                    y = 0;
+                    x++;
+                }
             }else if(line[0] == protocolo::delimitador_i){
                 size_t pos = line.find(":");
                 QString des = QString::fromStdString(line.substr(pos + 1));
@@ -282,7 +290,7 @@ void olymain::begin(){
     options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
 }
 void olymain::stop(){
-    timer.stop();
+    //timer.stop();
     string dir = string(":/images/Imagenes/1.png");
     options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
 }
