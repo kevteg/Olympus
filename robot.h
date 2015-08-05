@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <QQueue>
+#include <QToolButton>
 #include "messenger.h"
 #include "protocolo.h"
 #define _main 0
@@ -42,10 +43,14 @@ public:
     //void operator<<(char *a);
     ~robot();
 private:
-    QHBoxLayout      *things_layout;
+    QVBoxLayout      *things_layout;
+    QHBoxLayout      *half_layout;
+    QHBoxLayout      *sensors_layout;
+    QVBoxLayout      *control_layout;
+    QLabel           **sensors;
+    QLabel           *robot_nombre;
+    QToolButton      *control_manual_boton;
     Console          *board; //Las consolas se usarán como pizarrones
-    QGroupBox        *exceptions_group;
-    QCheckBox        **sensores;
     QLabel           *actual_behavior;
     QString          name;
     QQueue<QString>* messages_queue;

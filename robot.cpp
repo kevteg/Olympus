@@ -1,49 +1,78 @@
 #include "robot.h"
 /*TODO: Una guía del protocolo*/
-robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox(name, parent){
-    board = new Console(Qt::lightGray, Qt::black, "> ", false, this);
-    this->setStyleSheet("QGroupBox{ background: rgb(0,255,0);}QGroupBox::indicator {\
-                      } QGroupBox::title{ subcontrol-origin: margin;  subcontrol-position: top left;}");
-    this->name = name;
-    this->identificator = identificator;
-    this->behave = new char[n_behaves];
-    this->sender_safe = sender_safe;
-    this->queue_safe = queue_safe;
-    this->messages_queue = messages_queue;
-
-    this->setFixedWidth(370);
-    this->setFixedHeight(200);
-    /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
-    this->behave[_main] = none;
-    this->behave[secondary] = none;
-
-    sensores                                = new QCheckBox*[protocolo::numero_excepciones] ;
-    sensores[protocolo::sensor_distancia]   = new QCheckBox("Distancia", this);
-    sensores[protocolo::sensor_infrarojo]   = new QCheckBox("Infrarojo", this);
-
+robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox("", parent){
+    QFont f( "Adec", 14, QFont::Normal);
+    board                                   = new Console(Qt::white, Qt::black, "> ", false, this);
+    robot_nombre                            = new QLabel(this);
+    this->identificator                     = identificator;
+    this->behave                            = new char[n_behaves];
+    this->sender_safe                       = sender_safe;
+    this->queue_safe                        = queue_safe;
+    this->messages_queue                    = messages_queue;
+    things_layout                           = new QVBoxLayout;
+    half_layout                             = new QHBoxLayout;
+    sensors_layout                          = new QHBoxLayout;
+    control_layout                          = new QVBoxLayout;
+    control_manual_boton                    = new QToolButton(this);
+    actual_behavior                         = new QLabel("ESPERANDO", this);
+    sensors                                 = new QLabel*[protocolo::numero_excepciones];
+    sensors[protocolo::sensor_distancia]    = new QLabel(this);
+    sensors[protocolo::sensor_infrarojo]    = new QLabel(this);
     exceptions                              = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
-    things_layout                           = new QHBoxLayout;
-    actual_behavior                         = new QLabel("Comportamiento", this);
-    exceptions_group                        = new QGroupBox("Sensores", this);
 
-    //things_layout->addSpacing(2);
-    exceptions_group->setStyleSheet(" QGroupBox{ background-color:rgb(0); color: black; font: 10pt ;font: bold; text-align:center;}");
-    sensores[protocolo::sensor_infrarojo]->setStyleSheet("QCheckBox{color: black; font: 10pt}"); //Para que se siga viendo oscuro después de desabilitar
-    sensores[protocolo::sensor_distancia]->setStyleSheet("QCheckBox{color: black; font: 10pt}");
-    actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");
-    exceptions_group->setStyleSheet("QGroupBox {background: transparent; border: none;}");
-    exceptions_group->setEnabled(false);
-    QVBoxLayout *exceptions_layout = new QVBoxLayout;
-    exceptions_layout->addWidget(sensores[protocolo::sensor_infrarojo]);
-    exceptions_layout->addWidget(sensores[protocolo::sensor_distancia]);
-    exceptions_group->setLayout(exceptions_layout);
 
-    things_layout->addWidget(board);
-    things_layout->addWidget(exceptions_group);
-    things_layout->addWidget(actual_behavior);
+    this->setStyleSheet("QGroupBox{ background: rgb(27, 188, 155);} ");
+    this->setFixedWidth(370);
+    this->setFixedHeight(200);
+    /*Nombre del robot*/
+    robot_nombre->setText(name.toUpper());
+    robot_nombre->setFont(f);
+    robot_nombre->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    robot_nombre->setAlignment(Qt::AlignCenter);
+
+    actual_behavior->setFont(f);
+    actual_behavior->setStyleSheet("QLabel {color : rgb(200, 247, 197); }");
+    actual_behavior->setAlignment(Qt::AlignCenter);
+    things_layout->addWidget(robot_nombre);
+
+    /*Half layout, control, comportamiento y consola*/
+    /*Vertical layout: Control y comportamiento*/
+    control_manual_boton->setIcon(QIcon(QString::fromStdString(":/images/Imagenes/5.png")));
+    control_manual_boton->setIconSize(QSize(100, 100));
+    control_manual_boton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    control_manual_boton->setStyleSheet("QToolButton {\
+                                          border-radius: 50%;\
+                                          width: 100px;\
+                                          height: 100px;\
+                                          position: centered;} \
+                                          QToolButton:pressed { \
+                                          background-color: rgb(67, 97, 102);\
+                                          }");
+    control_layout->addWidget(control_manual_boton);
+    control_layout->addWidget(actual_behavior);
+    half_layout->addLayout(control_layout);
+    half_layout->addWidget(board);
+    things_layout->addLayout(half_layout);
+    /*Sensors layout*/
+    sensors[protocolo::sensor_distancia]->setText("DISTANCIA");
+    sensors[protocolo::sensor_distancia]->setFont(f);
+    sensors[protocolo::sensor_distancia]->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    sensors[protocolo::sensor_distancia]->setAlignment(Qt::AlignCenter);
+    sensors[protocolo::sensor_infrarojo]->setText("INFRAROJO");
+    sensors[protocolo::sensor_infrarojo]->setFont(f);
+    sensors[protocolo::sensor_infrarojo]->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    sensors[protocolo::sensor_infrarojo]->setAlignment(Qt::AlignCenter);
+    sensors_layout->addWidget(sensors[protocolo::sensor_distancia]);
+    sensors_layout->addWidget(sensors[protocolo::sensor_infrarojo]);
+    things_layout->addLayout(sensors_layout);
+
+    /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
+    this->behave[_main] = none;
+    this->behave[secondary] = none;
     this->setLayout(things_layout);
+
     string _first_m;
     /*TODO: Si el comportamiento tiene una parte secundaria*/
     _first_m = protocolo::delimitador_i;
@@ -96,7 +125,7 @@ void robot::operator<<(QString data){
             case protocolo::Excepcion_tipo:
                 if(data.size() > 7){
                     exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
-                    sensores[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
+                    //sensors[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
                     board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
                 }
             break;
