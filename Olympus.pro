@@ -25,7 +25,8 @@ SOURCES += main.cpp      \
         console.cpp      \
         messenger.cpp \
     verifytime.cpp \
-    swarm.cpp
+    swarm.cpp \
+    control_manual.cpp
 
 HEADERS  += olymain.h      \
             robot.h        \
@@ -34,7 +35,8 @@ HEADERS  += olymain.h      \
             protocolo.h    \
             messenger.h \
     verifytime.h \
-    swarm.h
+    swarm.h \
+    control_manual.h
 
 FORMS    += olymain.ui  \
             preferencias.ui 

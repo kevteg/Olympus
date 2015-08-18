@@ -21,6 +21,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions                              = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
+    control                                 = new control_manual(name);
 
 
     this->setStyleSheet("QGroupBox{ background: rgb(27, 188, 155);} ");
@@ -68,6 +69,8 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     sensors_layout->addWidget(sensors[protocolo::sensor_infrarojo]);
     things_layout->addLayout(sensors_layout);
 
+
+    setConnections();
     /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
     this->behave[_main] = none;
     this->behave[secondary] = none;
@@ -136,6 +139,10 @@ void robot::operator<<(QString data){
     }else
         qDebug() << "Mensaje ya procesado: " << data;
 }
+void robot::setConnections(){
+    connect(control_manual_boton, SIGNAL(clicked()), control, SLOT(show()));
+}
+
 bool robot::getException(int exception_tipe){
     return exceptions[exception_tipe];
 }

@@ -2,14 +2,15 @@
 #define ROBOT_H
 #include <QGroupBox>
 #include <QtCore/QDebug>
-#include <console.h>
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLabel>
+#include <QToolButton>
 #include <iostream>
 #include <string>
 #include <QQueue>
-#include <QToolButton>
+#include "control_manual.h"
+#include "console.h"
 #include "messenger.h"
 #include "protocolo.h"
 #define _main 0
@@ -38,10 +39,13 @@ public:
     /*Si la pudo cambiar retorna true, si no esta en el modo correcto o hay algo mal con exception_type retornará false*/
     bool changeOptions(int exception_type, bool option);
 
+    void setConnections();
     /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
     void find();
     //void operator<<(char *a);
+
     ~robot();
+
 private:
     QVBoxLayout      *things_layout;
     QHBoxLayout      *half_layout;
@@ -60,6 +64,7 @@ private:
     bool             *exceptions;
     bool             *queue_safe;
     bool             *sender_safe;
+    control_manual   *control;
 };
 
 #endif // ROBOT_H
