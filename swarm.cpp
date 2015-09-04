@@ -5,14 +5,22 @@ swarm::swarm(){
 }
 
 swarm::~swarm(){
+
+    for(vector<robot*>::iterator r =  robots->begin(); r != robots->end(); ++r)
+        delete *r;
+
     delete robots;
+
 }
 vector<robot*> *swarm::getRobots(){
     return robots;
 }
+void swarm::closeControls(){
+    for(vector<robot*>::iterator r =  robots->begin(); r != robots->end(); ++r)
+        (*r)->getControl()->close();
+}
 
 QString swarm::sendData(QByteArray data){
-
     QString name = "err";
     /*Si el mensaje no cumple el protocolo o si no existe el robot se envia err*/
     if(protocolo::verificacion(data, 0))

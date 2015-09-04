@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QtSerialPort/QSerialPort>
+#include "qjoystickenumerator.h"
 
 QT_USE_NAMESPACE
 QT_BEGIN_NAMESPACE
@@ -19,7 +20,7 @@ class preferencias : public QDialog{
     Q_OBJECT
 
 public:
-    struct preferencia {
+    struct preferencia{
         QString nombre;
         qint32 baudRate;
         QString stringBaudRate;
@@ -32,6 +33,7 @@ public:
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
         QString robotBehave;
+        QJoystick *joystick;
         bool localEchoEnabled;
     };
 
@@ -39,7 +41,8 @@ public:
     ~preferencias();
 
     preferencia Preferencia() const;
-
+signals:
+    void info_update(preferencias::preferencia set);
 private slots:
     /**
      * @brief Mostrar información del puerto seleccionado en la lista
@@ -55,6 +58,10 @@ private slots:
      * @param idx: indice del espacio a modificar
      */
     void checkCustomBaudRatePolicy(int idx);
+    /**
+     * @brief Selección del Joystick
+     */
+    void show_joy();
 
 private:
     /**

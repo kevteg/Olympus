@@ -16,13 +16,12 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     sender_safe                          = true;
     queue_safe                           = true;
     var                                  = "";
-
+    joystick                             = NULL;
     botones[option_connect_disconnect]   = string("Conectar/Desconectar");
     botones[option_start_stop]           = string("Iniciar/detener");
     botones[option_preferences]          = string("Preferencias");
     botones[option_about]                = string("Acerca de");
     botones[option_exit]                 = string("Salir");
-
     checker                              = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
     QGroupBox *board_container           = new QGroupBox("", this);
     QGroupBox *terminal_container        = new QGroupBox("", this);
@@ -184,16 +183,6 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         p.setColor(QPalette::Text, Qt::white);
         ui->statusBar->setPalette(p);
         ui->statusBar->setAutoFillBackground(true);
-
-    /*string _first_m;
-    _first_m = protocolo::delimitador_i;
-    _first_m += 'A';
-    _first_m += protocolo::separador;
-    _first_m += protocolo::Explorar;
-    _first_m += protocolo::delimitador_f;
-    (*swarm_object->getRobots()->at(0)) << QString::fromStdString(_first_m);*/
-
-    //swarm_object->sendData(QString::fromStdString(_first_m).toLatin1());
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -235,6 +224,7 @@ void olymain::setConections(){
     connect(options[option_start_stop], SIGNAL(clicked()), this, SLOT(robotRutine()));
     connect(options[option_preferences], SIGNAL(clicked()), settings, SLOT(show()));
     connect(options[option_about], SIGNAL(clicked()), this, SLOT(openAbout()));
+    connect(settings, SIGNAL(info_update(preferencias::preferencia)), this, SLOT(change_info(preferencias::preferencia)));
     connect(serial, SIGNAL(readyRead()), this, SLOT(recieveInformation()));
     /*Console*/
     connect(terminal, SIGNAL(showAbout()), this, SLOT(openAbout()));
@@ -245,6 +235,13 @@ void olymain::setConections(){
 void olymain::changeMessState(){
     show_comming_info = !show_comming_info;
 }
+void olymain::change_info(preferencias::preferencia set){
+    this->opt = set;
+    joystick = opt.joystick;
+    if(joystick)
+        for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
+            (*r)->getControl()->connect_joy(joystick);
+}
 
 void olymain::connect_serial(){
     serial_connection = !serial_connection;
@@ -254,7 +251,7 @@ void olymain::connect_serial(){
         disconnection();
 }
 void olymain::connection(){
-    preferencias::preferencia opt = settings->Preferencia();
+     opt = settings->Preferencia();
     if(sender->createConnection(opt)){
         /*Cambiar al icono de desconeccion*/
         string dir = string(":/images/Imagenes/00.png");
@@ -335,7 +332,19 @@ void olymain::recieveInformation(){
        sender_safe = true;
    }
 }
-
+void olymain::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Olympus",
+                                                                tr("¿Desea salir? :(\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if(resBtn != QMessageBox::Yes){
+        event->ignore();
+    }else{
+        swarm_object->closeControls();
+        event->accept();
+    }
+}
 olymain::~olymain(){
     thread.quit();
     delete ui;

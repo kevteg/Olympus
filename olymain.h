@@ -11,6 +11,7 @@
 #include <QtCore>
 #include <sstream>
 #include <QSerialPort>
+#include "robot.h"
 #include "console.h"
 #include "messenger.h"
 #include "preferencias.h"
@@ -53,30 +54,35 @@ private slots:
     void openAbout();
     void recieveInformation();
     void changeMessState();
+    void change_info(preferencias::preferencia set);
 signals:
     void stopTimer();
+protected:
+    virtual void closeEvent(QCloseEvent *);
 private:
-    Ui::olymain     *ui;
-    int             num_robots;
-    bool            manual_control;
-    Console         *board;
-    Console         *terminal;
-    QSerialPort     *serial;
-    messenger       *sender;
-    QToolButton     **options;
-    preferencias    *settings;
-    QQueue<QString> *messages_queue;
-    QThread         thread;
-    QTimer          timer;
-    verifyTime      *checker;
-    swarm           *swarm_object;
+    Ui::olymain               *ui;
+    int                        num_robots;
+    bool                       manual_control;
+    Console                   *board;
+    Console                   *terminal;
+    QSerialPort               *serial;
+    messenger                 *sender;
+    QToolButton              **options;
+    preferencias              *settings;
+    preferencias::preferencia  opt;
+    QQueue<QString>           *messages_queue;
+    QThread                    thread;
+    QTimer                     timer;
+    verifyTime                *checker;
+    swarm                     *swarm_object;
+    QJoystick                 *joystick;
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
-    bool            sender_safe;
-    bool            queue_safe;
-    bool            serial_connection;
-    bool            rutine_robots;
-    QString         var;
-    bool            show_comming_info;
+    bool                       sender_safe;
+    bool                       queue_safe;
+    bool                       serial_connection;
+    bool                       rutine_robots;
+    QString                    var;
+    bool                       show_comming_info;
 
 };
 

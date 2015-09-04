@@ -9,7 +9,7 @@ QT_USE_NAMESPACE
 
 preferencias::preferencias(QWidget *parent) : QDialog(parent), ui(new Ui::preferencias){
     ui->setupUi(this);
-
+    actualPreferencia.joystick = NULL;
     intValidator = new QIntValidator(0, 4000000, this);//Un intervalo para selecciones
 
     ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
@@ -20,7 +20,8 @@ preferencias::preferencias(QWidget *parent) : QDialog(parent), ui(new Ui::prefer
             this, SLOT(infoPuerto(int)));
     connect(ui->baudRateBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(checkCustomBaudRatePolicy(int)));
-
+    connect(ui->selectjoy, SIGNAL(clicked()),
+            this, SLOT(show_joy()));
     mostrar_parametrosPuertos();
     mostrar_informacionPuertos();
     actualizarPreferencia();
@@ -48,6 +49,7 @@ void preferencias::infoPuerto(int idx){
 
 void preferencias::aplicar(){
     actualizarPreferencia();
+    emit info_update(actualPreferencia);
     hide();
 }
 
@@ -59,6 +61,15 @@ void preferencias::checkCustomBaudRatePolicy(int idx){
         QLineEdit *edit = ui->baudRateBox->lineEdit();
         edit->setValidator(intValidator);
     }
+}
+void preferencias::show_joy(){
+    //qDebug() << "HOLA";
+     QJoystick *nJoystick = QJoystickEnumerator::enumerate("/dev/input", this);
+     if(nJoystick != NULL) {
+         if(actualPreferencia.joystick != NULL)
+             delete actualPreferencia.joystick;
+         actualPreferencia.joystick = nJoystick;
+     }
 }
 
 void preferencias::mostrar_parametrosPuertos(){
@@ -81,18 +92,15 @@ void preferencias::mostrar_parametrosPuertos(){
     ui->parityBox->addItem(QStringLiteral("Espacio"), QSerialPort::SpaceParity);
 
     ui->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
-#ifdef Q_OS_WIN //Si es windows
-    ui->stopBitsBox->addItem(QStringLiteral("1.5"), QSerialPort::OneAndHalfStop);
-#endif
+    #ifdef Q_OS_WIN //Si es windows
+        ui->stopBitsBox->addItem(QStringLiteral("1.5"), QSerialPort::OneAndHalfStop);
+    #endif
     ui->stopBitsBox->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
 
     ui->flowControlBox->addItem(QStringLiteral("Ninguna"), QSerialPort::NoFlowControl);
     ui->flowControlBox->addItem(QStringLiteral("RTS/CTS"), QSerialPort::HardwareControl);
     ui->flowControlBox->addItem(QStringLiteral("XON/XOFF"), QSerialPort::SoftwareControl);
 
-    ui->behaviorList->addItem(QStringLiteral("Explorar"), QString("A"));
-    ui->behaviorList->addItem(QStringLiteral("Evadir"), QString("B"));
-    ui->behaviorList->addItem(QStringLiteral("Seguir instrucciones"), QString("C"));
 
 }
 
@@ -114,7 +122,6 @@ void preferencias::mostrar_informacionPuertos(){
              << info.systemLocation()
              << (info.vendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : blankString)
              << (info.productIdentifier() ? QString::number(info.productIdentifier(), 16) : blankString);
-
         ui->serialPortInfoListBox->addItem(list.first(), list); //Toda la lista de cosas queda guardada
     }
 }
@@ -145,7 +152,5 @@ void preferencias::actualizarPreferencia(){
     actualPreferencia.flowControl = static_cast<QSerialPort::FlowControl>(
                 ui->flowControlBox->itemData(ui->flowControlBox->currentIndex()).toInt());
     actualPreferencia.stringFlowControl = ui->flowControlBox->currentText();
-
-    actualPreferencia.robotBehave = (ui->behaviorList->itemData(ui->behaviorList->currentIndex()).toString());
 }
 

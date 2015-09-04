@@ -8,5 +8,14 @@
         <file>Imagenes/4.png</file>
         <file>Imagenes/11.png</file>
         <file>Imagenes/5.png</file>
+        <file>Imagenes/I1.png</file>
+        <file>Imagenes/I2.png</file>
+        <file>Imagenes/U1.png</file>
+        <file>Imagenes/U2.png</file>
+        <file>Imagenes/arrow2.png</file>
+        <file>Imagenes/arrow3.png</file>
+        <file>Imagenes/arrow1.png</file>
+        <file>Imagenes/arrow4.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

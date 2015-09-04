@@ -6,23 +6,30 @@
 #ifndef PROTOCOLO
 #define PROTOCOLO
 #include <QString>
+
 class protocolo{
 public:
     enum importante{
         tam_min = 5
     };
-
+    enum Type
+    {
+        INT,
+        CHAR
+    };
     enum comportamientos{
         Explorar           = 'A',
         Evadir             = 'B',
         Seguir_instruccion = 'C',
-        Detener            = '!'
+        Detener            = '!',
+        total_comportamientos = 4
     };
     enum tipo_instruccion{
         Comportamiento_tipo = 0,
         Busqueda_tipo       = 1,
         Excepcion_tipo      = 2,
-        Caracteres_tipo     = 3
+        Caracteres_tipo     = 3,
+        opcion_cmp_tipo     = 4
     };
 
     static QString *cadenas_comportamientos;
@@ -50,10 +57,10 @@ public:
          eje_1       = 0,
          eje_2       = 1,
          rango       = 27000,
-         adelante_j  = 1,
-         atras_j     = 2,
-         derecha_j   = 3,
-         izquierda_j = 4
+         up          = 1,
+         down        = 2,
+         right       = 3,
+         left        = 0
     };
 
     static QString getCadenaInstruccion(char instruccion){
@@ -68,7 +75,8 @@ public:
                 return "Seguir instrucciones";
             break;
             case Detener:
-                return "Detenido";
+            case 'D':
+                return "Esperando";
             break;
             case adelante:
                 return "adelante";
@@ -91,10 +99,6 @@ public:
             case Evadir:
             case Seguir_instruccion:
             case Detener:
-            case adelante:
-            case atras:
-            case derecha:
-            case izquierda:
                 return Comportamiento_tipo;
             break;
             case buscar:
@@ -108,6 +112,12 @@ public:
             case delimitador_f:
             case separador:
                 return Caracteres_tipo;
+            break;
+            case adelante:
+            case atras:
+            case derecha:
+            case izquierda:
+                return opcion_cmp_tipo;
             break;
         }
         return 0;

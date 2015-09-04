@@ -12,6 +12,7 @@ public:
     vector <robot*>* getRobots();
     /*Si al robot al que se le intenta enviaro del que se esta recibiendo existe y el mensaje esta bien se retorna el nombre del robot*/
     QString sendData(QByteArray data);
+    void closeControls();
 private:
     vector <robot*> *robots;
 };

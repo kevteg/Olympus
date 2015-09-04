@@ -23,7 +23,6 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions[protocolo::sensor_infrarojo] = false;
     control                                 = new control_manual(name);
 
-
     this->setStyleSheet("QGroupBox{ background: rgb(27, 188, 155);} ");
     this->setFixedWidth(370);
     this->setFixedHeight(200);
@@ -49,7 +48,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
                                           height: 100px;\
                                           position: centered;} \
                                           QToolButton:pressed { \
-                                          background-color: rgb(67, 97, 102);\
+                                          background-color: rgb(33, 193, 163);\
                                           }");
     control_layout->addWidget(control_manual_boton);
     control_layout->addWidget(actual_behavior);
@@ -106,7 +105,7 @@ void robot::operator<<(QString data){
             case protocolo::Comportamiento_tipo:
                 if(behave[_main] != data.at(3).toLatin1()){
                     behave[_main] = data.at(3).toLatin1();
-                    actual_behavior->setText("Comportamiento: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n");
+                    actual_behavior->setText(protocolo::getCadenaInstruccion(data.at(3).toLatin1()).toUpper());
                     board->putData(QString("Nuevo comportamiento definido: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n").toLatin1());
                 }
                 if(data.size() > protocolo::tam_min){
@@ -119,7 +118,7 @@ void robot::operator<<(QString data){
                 if(data.at(3).toLatin1() == protocolo::Detener)
                     actual_behavior->setStyleSheet("QLabel{color:red; font:12pt; font:bold;}");
                 else
-                    actual_behavior->setStyleSheet("QLabel{color:black; font:12pt; font:bold;}");
+                    actual_behavior->setStyleSheet("QLabel {color : rgb(200, 247, 197); }");
             break;
             case protocolo::Busqueda_tipo:
                 /*Podría ser que se guarde si se habia buscado*/
@@ -141,87 +140,21 @@ void robot::operator<<(QString data){
 }
 void robot::setConnections(){
     connect(control_manual_boton, SIGNAL(clicked()), control, SLOT(show()));
+    connect(control, SIGNAL(movement(char)), this, SLOT(seguirInstrucciones(char)));
+    connect(control, SIGNAL(exc(int, bool)), this, SLOT(setException(int, bool)));
+    connect(control, SIGNAL(behave(char)), this, SLOT(setBehave(char)));
 }
 
 bool robot::getException(int exception_tipe){
     return exceptions[exception_tipe];
 }
-bool robot::changeOptions(char behave){
+bool robot::setException(int exception_type, bool option){
+    bool retorno = false;
     string message;
-    message = protocolo::delimitador_i;
-    message += this->identificator;
-    message += protocolo::separador;
-    switch(behave){
-        case protocolo::Explorar:
-            message += protocolo::Explorar;
-        break;
-        case protocolo::Evadir:
-            message += protocolo::Evadir;
-        break;
-        case protocolo::Seguir_instruccion:
-            message += protocolo::Evadir;
-        break;
-        case protocolo::Detener:
-            message += protocolo::Detener;
-        break;
-        case protocolo::buscar:
-            message += protocolo::buscar;
-        break;
-        default:
-            qDebug() << "Error[6]: Opción errónea. No se ha cambiado nada";
-            return false;
-        break;
-    }
-    message = protocolo::delimitador_f;
-    *queue_safe = false;
-    messages_queue->enqueue(QString().fromStdString(message));
-    *queue_safe = true;
-    return true;
-}
-bool robot::changeOptions(char behave, char option_1){
-    string message;
-    message = protocolo::delimitador_i;
-    message += this->identificator;
-    message += protocolo::separador;
-    switch(behave){
-        case protocolo::Seguir_instruccion:
-            message += protocolo::Evadir;
-            message += protocolo::separador;
-            switch(option_1){
-                case protocolo::adelante:
-                    message += protocolo::adelante;
-                break;
-                case protocolo::atras:
-                    message += protocolo::atras;
-                break;
-                case protocolo::derecha:
-                    message += protocolo::derecha;
-                break;
-                case protocolo::izquierda:
-                    message += protocolo::izquierda;
-                break;
-                default:
-                    qDebug() << "Error[7]: Opción errónea. Seguir instrucciones no posee esa instrucción";
-                    return false;
-                break;
-            }
-        break;
-        default:
-            qDebug() << "Error[8]: Opción errónea. Seguir instrucciones es el único comportamiento con mas opciones";
-            return false;
-        break;
-    }
-    message = protocolo::delimitador_f;
-    *queue_safe = false;
-    messages_queue->enqueue(QString().fromStdString(message));
-    *queue_safe = true;
-    return true;
-}
-bool robot::changeOptions(int exception_type, bool option){
     qDebug() << this->behave[_main] ;
     if(this->behave[_main] == protocolo::Seguir_instruccion
        && (exception_type == protocolo::sensor_distancia || exception_type == protocolo::sensor_infrarojo)){
-        string message;
+        retorno = true;
         message = protocolo::delimitador_i;
         message += this->identificator;
         message += protocolo::separador;
@@ -234,14 +167,77 @@ bool robot::changeOptions(int exception_type, bool option){
         *queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
         *queue_safe = true;
-        return true;
     }else
         qDebug() << "Error[5]: No se pueden cambiar las excepciones porque el comportamiento por defecto no es seguir instrucciones.";
-    return false;
+    return retorno;
+}
+
+bool robot::setBehave(char behave, char opcion){
+    bool retorno = false;
+    string message;
+    if(protocolo::getTipoInstruccion(behave) == protocolo::Comportamiento_tipo){
+        retorno = true;
+        message = protocolo::delimitador_i;
+        message += this->identificator;
+        message += protocolo::separador;
+        message += behave;
+        if(protocolo::getTipoInstruccion(opcion) == protocolo::opcion_cmp_tipo){
+            message += protocolo::separador;
+            message += opcion;
+        }
+        message += protocolo::delimitador_f;
+        *queue_safe = false;
+        messages_queue->enqueue(QString().fromStdString(message));
+        *queue_safe = true;
+    }else
+        qDebug() << "Error[6]: Ese comportamiento es incorrecto";
+    return retorno;
+}
+bool robot::setBehave(char behave){
+    bool retorno = false;
+    string message;
+    if(protocolo::getTipoInstruccion(behave) == protocolo::Comportamiento_tipo){
+        retorno = true;
+        message = protocolo::delimitador_i;
+        message += this->identificator;
+        message += protocolo::separador;
+        message += behave;
+        message += protocolo::delimitador_f;
+        qDebug() << QString::fromStdString(message);
+        *queue_safe = false;
+        messages_queue->enqueue(QString().fromStdString(message));
+        *queue_safe = true;
+    }else
+        qDebug() << "Error[6]: Ese comportamiento es incorrecto";
+    return retorno;
+}
+
+bool robot::evadir(){
+    return setBehave(protocolo::Evadir);
+}
+
+bool robot::detener(){
+    return setBehave(protocolo::Detener);
+}
+
+bool robot::seguirInstrucciones(char opcion){
+    return setBehave(protocolo::Seguir_instruccion, opcion);
+}
+bool robot::seguirInstrucciones(){
+    return setBehave(protocolo::Seguir_instruccion);
+}
+bool robot::explorar(){
+    return setBehave(protocolo::Explorar);
+}
+
+control_manual* robot::getControl(){
+    return control;
 }
 
 robot::~robot(){
     delete board;
     delete exceptions;
+    delete control;
 }
+
 
