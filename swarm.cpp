@@ -28,6 +28,7 @@ QString swarm::sendData(QByteArray data){
            if((*r)->getIdentificator() == data.at(1)){
                *(*r) << QString::fromLatin1(data);
                name = (*r)->getName();
+               qDebug() << name;
            }
     return name;
 }

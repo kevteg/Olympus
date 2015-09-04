@@ -72,7 +72,7 @@ public:
                 return "Evadir";
             break;
             case Seguir_instruccion:
-                return "Seguir instrucciones";
+                return "Seguir\ninstrucciones";
             break;
             case Detener:
             case 'D':

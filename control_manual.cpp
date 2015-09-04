@@ -247,11 +247,12 @@ void control_manual::keyPressEvent(QKeyEvent *e){
         break;
         case Qt::Key_Tab:
             behaviors->setFocusPolicy(Qt::NoFocus);
-            qDebug() << "asd";
+        break;
+        case Qt::Key_Escape:
+            this->close();
         break;
         default:
             behaviors->setFocusPolicy(Qt::NoFocus);
-            qDebug() << "asd";
         break;
     }
 }

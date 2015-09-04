@@ -18,6 +18,10 @@
 #define secondary 1
 #define n_behaves 2
 #define none '-'
+#define GRIS "QLabel {color : rgb(189, 195, 199); }" //Color gris para etiquetas
+#define ROJO "QLabel {color : rgb(207, 0, 15); }" //Color rojo para etiquetas
+#define BLANCO "QLabel {color : rgb(200, 247, 197); }"//Color blanco para etiquetas
+#define AZUL "QLabel {color : rgb(44, 62, 80); }"//Color azul para etiquetas
 
 using namespace std;
 class robot : public QGroupBox{

@@ -2,6 +2,7 @@
 /*TODO: Una guía del protocolo*/
 robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox("", parent){
     QFont f( "Adec", 14, QFont::Normal);
+    this->name                              = name;
     board                                   = new Console(Qt::white, Qt::black, "> ", false, this);
     robot_nombre                            = new QLabel(this);
     this->identificator                     = identificator;
@@ -22,6 +23,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
     control                                 = new control_manual(name);
+    control_manual_boton->setEnabled(false);
 
     this->setStyleSheet("QGroupBox{ background: rgb(27, 188, 155);} ");
     this->setFixedWidth(370);
@@ -29,11 +31,11 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     /*Nombre del robot*/
     robot_nombre->setText(name.toUpper());
     robot_nombre->setFont(f);
-    robot_nombre->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    robot_nombre->setStyleSheet(AZUL);
     robot_nombre->setAlignment(Qt::AlignCenter);
 
     actual_behavior->setFont(f);
-    actual_behavior->setStyleSheet("QLabel {color : rgb(200, 247, 197); }");
+    actual_behavior->setStyleSheet(BLANCO);
     actual_behavior->setAlignment(Qt::AlignCenter);
     things_layout->addWidget(robot_nombre);
 
@@ -58,36 +60,26 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     /*Sensors layout*/
     sensors[protocolo::sensor_distancia]->setText("DISTANCIA");
     sensors[protocolo::sensor_distancia]->setFont(f);
-    sensors[protocolo::sensor_distancia]->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    sensors[protocolo::sensor_distancia]->setStyleSheet(GRIS);
     sensors[protocolo::sensor_distancia]->setAlignment(Qt::AlignCenter);
     sensors[protocolo::sensor_infrarojo]->setText("INFRAROJO");
     sensors[protocolo::sensor_infrarojo]->setFont(f);
-    sensors[protocolo::sensor_infrarojo]->setStyleSheet("QLabel {color : rgb(44, 62, 80); }");
+    sensors[protocolo::sensor_infrarojo]->setStyleSheet(GRIS);
     sensors[protocolo::sensor_infrarojo]->setAlignment(Qt::AlignCenter);
     sensors_layout->addWidget(sensors[protocolo::sensor_distancia]);
     sensors_layout->addWidget(sensors[protocolo::sensor_infrarojo]);
     things_layout->addLayout(sensors_layout);
-
-
     setConnections();
     /*Nota el comportamiento por defecto quedará definido cuando se envie por primera vez*/
     this->behave[_main] = none;
     this->behave[secondary] = none;
     this->setLayout(things_layout);
 
-    string _first_m;
-    /*TODO: Si el comportamiento tiene una parte secundaria*/
-    _first_m = protocolo::delimitador_i;
-    _first_m += this->identificator;
-    _first_m += protocolo::separador;
-    _first_m += default_behave;
-    _first_m += protocolo::delimitador_f;
-    *queue_safe = false;
-    messages_queue->enqueue(QString().fromStdString(_first_m));
-    *queue_safe = true;
+    setBehave(default_behave);
 }
 
 QString robot::getName(){
+    qDebug() << name;
     return name;
 }
 
@@ -97,7 +89,8 @@ char robot::getIdentificator(){
 void robot::operator<<(QString data){
     /*El operador se usa para procesar los mensajes que se van enviando*/
     if(data != old_m){
-        qDebug() << "Procesando: " << data;
+        control_manual_boton->setEnabled(true);
+        qDebug() << "Robot " << name << " procesando: " << data;
         old_m = data;
         /*El robot vuelve a verificar que la orden este bien*/
         if(protocolo::verificacion(data.toLatin1(), 0) && data.at(1) == this->identificator){
@@ -106,6 +99,14 @@ void robot::operator<<(QString data){
                 if(behave[_main] != data.at(3).toLatin1()){
                     behave[_main] = data.at(3).toLatin1();
                     actual_behavior->setText(protocolo::getCadenaInstruccion(data.at(3).toLatin1()).toUpper());
+                    if(actual_behavior->text().count() > 10){
+                        QFont fuente("Adec", 10, QFont::Normal);
+                        actual_behavior->setFont(fuente);
+                    }else{
+                        QFont fuente("Adec", 14, QFont::Normal);
+                        actual_behavior->setFont(fuente);
+                    }
+
                     board->putData(QString("Nuevo comportamiento definido: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n").toLatin1());
                 }
                 if(data.size() > protocolo::tam_min){
@@ -116,9 +117,9 @@ void robot::operator<<(QString data){
                 }else
                     behave[secondary] = none;
                 if(data.at(3).toLatin1() == protocolo::Detener)
-                    actual_behavior->setStyleSheet("QLabel{color:red; font:12pt; font:bold;}");
+                    actual_behavior->setStyleSheet(ROJO);
                 else
-                    actual_behavior->setStyleSheet("QLabel {color : rgb(200, 247, 197); }");
+                    actual_behavior->setStyleSheet(BLANCO);
             break;
             case protocolo::Busqueda_tipo:
                 /*Podría ser que se guarde si se habia buscado*/
@@ -127,6 +128,7 @@ void robot::operator<<(QString data){
             case protocolo::Excepcion_tipo:
                 if(data.size() > 7){
                     exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
+                    sensors[data.at(5).toLatin1() - '0']->setStyleSheet(!(data.at(7).toLatin1() - '0')?GRIS:ROJO);
                     //sensors[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
                     board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
                 }
@@ -151,9 +153,9 @@ bool robot::getException(int exception_tipe){
 bool robot::setException(int exception_type, bool option){
     bool retorno = false;
     string message;
-    qDebug() << this->behave[_main] ;
+    //qDebug() << this->behave[_main] ;
     if(this->behave[_main] == protocolo::Seguir_instruccion
-       && (exception_type == protocolo::sensor_distancia || exception_type == protocolo::sensor_infrarojo)){
+       && (exception_type == protocolo::sensor_distancia || exception_type == protocolo::sensor_infrarojo)){       
         retorno = true;
         message = protocolo::delimitador_i;
         message += this->identificator;
