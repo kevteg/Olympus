@@ -76,6 +76,7 @@ private:
     verifyTime                *checker;
     swarm                     *swarm_object;
     QJoystick                 *joystick;
+    QLabel                    *cant_robots;
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
     bool                       sender_safe;
     bool                       queue_safe;

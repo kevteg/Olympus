@@ -29,7 +29,20 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QGroupBox *info_container            = new QGroupBox("", this);
     serial_connection                    = false;
     rutine_robots                        = false;
+    cant_robots                          = new QLabel();
+    QLabel *etiqueta_info                = new QLabel("CANTIDAD DE ROBOTS\nCONECTADOS");
+    QVBoxLayout *terminal_layout         = new QVBoxLayout();
+    QVBoxLayout *board_layout            = new QVBoxLayout();
+    QVBoxLayout *internal_options_layout = new QVBoxLayout();
+    QHBoxLayout *more_options_layout     = new QHBoxLayout();
+    QVBoxLayout *info_layout             = new QVBoxLayout();
 
+    etiqueta_info->setFont(QFont("Avec", 13, QFont::Normal));
+    etiqueta_info->setAlignment(Qt::AlignCenter);
+    etiqueta_info->setStyleSheet("QLabel {color : rgb(228, 241, 254); }");
+    cant_robots->setStyleSheet("QLabel {color : rgb(200, 247, 197); }");
+    cant_robots->setAlignment(Qt::AlignCenter);
+    cant_robots->setFont(QFont("Avec", 100, QFont::Normal));
     for (int i = 0; i < n_options; i++) {
         stringstream numero;
         numero << i;
@@ -117,14 +130,8 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     opciones_titulos[1]->setText("CONEXIÓN SERIAL");
     opciones_titulos[2]->setText("RUTINAS DE ROBOTS");
 
-    QVBoxLayout *terminal_layout         = new QVBoxLayout();
-    QVBoxLayout *board_layout            = new QVBoxLayout();
-    QVBoxLayout *internal_options_layout = new QVBoxLayout();
-    QHBoxLayout *more_options_layout     = new QHBoxLayout();
-
     qDebug() << "Hilo principal: " << QThread::currentThreadId();
 
-    //ui->robots_layout->setAlignment(Qt::AlignLeft);
     ui->robots_layout->setSpacing(15);
     if(!openPreFile()){
         QMessageBox messageBox;
@@ -153,7 +160,9 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         internal_options_layout->addLayout(more_options_layout);
 
         options_container->setLayout(internal_options_layout);
-
+        info_layout->addWidget(etiqueta_info);
+        info_layout->addWidget(cant_robots);
+        info_container->setLayout(info_layout);
         ui->robots_container->setStyleSheet("QGroupBox{\
                                              background: rgb(239, 242, 242); \
                                             color: black; font: 11pt ;font: bold;   } \
@@ -178,11 +187,12 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
         setConections();
         defaultSituation();
     }
-        QPalette p = ui->statusBar->palette();
-        p.setColor( QPalette::Background, QColor(1, 152, 117));
-        p.setColor(QPalette::Text, Qt::white);
-        ui->statusBar->setPalette(p);
-        ui->statusBar->setAutoFillBackground(true);
+    QPalette p = ui->statusBar->palette();
+    p.setColor( QPalette::Background, QColor(1, 152, 117));
+    p.setColor(QPalette::Text, Qt::white);
+    ui->statusBar->setPalette(p);
+    ui->statusBar->setAutoFillBackground(true);
+    cant_robots->setText(QString(num_robots + 48));
 }
 bool olymain::openPreFile(){
    /*Abrir el archivo de configuración crear los robots y agregarlos al layout*/
@@ -206,6 +216,7 @@ bool olymain::openPreFile(){
                 manual_control = (des == "si")?true:false;
             }
         }
+        num_robots = swarm_object->getRobots()->size();
     }else
        return false;
     return true;

@@ -18,13 +18,13 @@ void verifyTime::onTimeout(){
        *sender_safe = false;
        *queue_safe = false;
        QString robot_name;
-       if(!messages_queue->isEmpty() /*&& sender->getSerial()->isOpen()*/){
+       if(!messages_queue->isEmpty() && sender->getSerial()->isOpen()){
            QString mensaje = messages_queue->dequeue();
            qDebug()<<"Hilo: "<<QThread::currentThreadId() << " intenta enviar: " << mensaje;
            robot_name = swarm_object->sendData(mensaje.toLatin1());
            /*Antes de enviar se verifica que lo que este en la cola. Si esta bien el mensaje se envia*/
            if(robot_name != "err"){
-                //sender->sendMessage(mensaje.toLatin1());
+                sender->sendMessage(mensaje.toLatin1());
                 terminal->putData(QString(QString::fromLatin1("Se envía: ") + mensaje + " a " + (robot_name.toLatin1()) + "\n").toLatin1());
                 qDebug() << "Envio correcto";
            }else{
