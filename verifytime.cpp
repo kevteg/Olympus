@@ -1,9 +1,6 @@
 #include "verifytime.h"
 
-verifyTime::verifyTime(Console *terminal, swarm *swarm_object, bool *sender_safe, bool *queue_safe, messenger *sender, QQueue<QString> *messages_queue, QObject *parent) : QObject(parent){
-    this->sender_safe = sender_safe;
-    this->queue_safe = queue_safe;
-    this->send_enabled = true;
+verifyTime::verifyTime(Console *terminal, swarm *swarm_object, messenger *sender, QQueue<QString> *messages_queue, QObject *parent) : QObject(parent){
     this->sender = sender;
     this->messages_queue = messages_queue;
     this->swarm_object = swarm_object;
@@ -13,14 +10,11 @@ verifyTime::verifyTime(Console *terminal, swarm *swarm_object, bool *sender_safe
 verifyTime::~verifyTime(){
 
 }
-void verifyTime::setSendEnable(bool send_enabled){
-    this->send_enabled = send_enabled;
-}
 
 void verifyTime::onTimeout(){
-   if(sender_safe && queue_safe && send_enabled){
-       *sender_safe = false;
-       *queue_safe = false;
+   if(protocolo::sender_safe && protocolo::queue_safe && protocolo::send_enabled){
+       protocolo::sender_safe = false;
+       protocolo::queue_safe  = false;
        QString robot_name;
        if(!messages_queue->isEmpty() && sender->getSerial()->isOpen()){
            QString mensaje = messages_queue->dequeue();
@@ -36,7 +30,8 @@ void verifyTime::onTimeout(){
                 qDebug() << "Envio fallido";
            }
        }
-       *sender_safe = true;
-       *queue_safe = true;
+       protocolo::sender_safe = true;
+       protocolo::queue_safe  = true;
    }
 }
+

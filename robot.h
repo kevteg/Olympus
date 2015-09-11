@@ -28,7 +28,7 @@ class robot : public QGroupBox{
     //friend class  control_manual;
       Q_OBJECT
 public:
-    robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent = 0);
+    robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, QWidget *parent = 0);
     QString getName();
     char getIdentificator();
     //0 ultra, 1 infra
@@ -83,8 +83,6 @@ private:
     QString           old_m;
     char             *behave;
     bool             *exceptions;
-    bool             *queue_safe;
-    bool             *sender_safe;
     control_manual   *control;
 };
 

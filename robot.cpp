@@ -1,14 +1,12 @@
 #include "robot.h"
 /*TODO: Una guía del protocolo*/
-robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, bool *queue_safe, QWidget *parent) : QGroupBox("", parent){
+robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, QWidget *parent) : QGroupBox("", parent){
     QFont f( "Adec", 14, QFont::Normal);
     this->name                              = name;
     board                                   = new Console(Qt::white, Qt::black, "> ", false, this);
     robot_nombre                            = new QLabel(this);
     this->identificator                     = identificator;
     this->behave                            = new char[n_behaves];
-    this->sender_safe                       = sender_safe;
-    this->queue_safe                        = queue_safe;
     this->messages_queue                    = messages_queue;
     things_layout                           = new QVBoxLayout;
     half_layout                             = new QHBoxLayout;
@@ -165,9 +163,9 @@ bool robot::setException(int exception_type, bool option){
         message += protocolo::separador;
         message += option?'1':'0';
         message += protocolo::delimitador_f;
-        *queue_safe = false;
+        protocolo::queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
-        *queue_safe = true;
+        protocolo::queue_safe = true;
     }else
         qDebug() << "Error[5]: No se pueden cambiar las excepciones porque el comportamiento por defecto no es seguir instrucciones.";
     return retorno;
@@ -187,9 +185,9 @@ bool robot::setBehave(char behave, char opcion){
             message += opcion;
         }
         message += protocolo::delimitador_f;
-        *queue_safe = false;
+        protocolo::queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
-        *queue_safe = true;
+        protocolo::queue_safe = true;
     }else
         qDebug() << "Error[6.1]: Ese comportamiento es incorrecto";
     return retorno;
@@ -205,9 +203,9 @@ bool robot::setBehave(char behave){
         message += behave;
         message += protocolo::delimitador_f;
         //qDebug() << QString::fromStdString(message);
-        *queue_safe = false;
+        protocolo::queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
-        *queue_safe = true;
+        protocolo::queue_safe = true;
     }else
         qDebug() << "Error[6.2]: Ese comportamiento es incorrecto";
     return retorno;

@@ -11,13 +11,10 @@
 #include <QtCore>
 #include <sstream>
 #include <QSerialPort>
-#include "robot.h"
+#include "verifytime.h"
 #include "console.h"
 #include "messenger.h"
 #include "preferencias.h"
-#include "protocolo.h"
-#include "verifytime.h"
-#include "swarm.h"
 
 #define option_connect_disconnect 0
 #define option_start_stop         1
@@ -27,7 +24,6 @@
 
 #define n_options 5
 using namespace std;
-
 
 namespace Ui {
 class olymain;
@@ -79,9 +75,6 @@ private:
     QJoystick                 *joystick;
     QLabel                    *cant_robots;
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
-    bool                       sender_safe;
-    bool                       queue_safe;
-    bool                       send_enabled;
     bool                       serial_connection;
     bool                       rutine_robots;
     QString                    var;

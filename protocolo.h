@@ -9,6 +9,11 @@
 
 class protocolo{
 public:
+    static bool sender_safe;
+    static bool queue_safe;
+    static bool send_enabled; //Variable que indica si están las rutinas de robots encendidas
+    //static QString *cadenas_comportamientos;
+
     enum importante{
         tam_min = 5
     };
@@ -32,7 +37,7 @@ public:
         opcion_cmp_tipo     = 4
     };
 
-    static QString *cadenas_comportamientos;
+
 
     enum robot_defecto{
         todos_robots = 'X'

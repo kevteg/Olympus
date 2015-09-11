@@ -16,6 +16,10 @@
         <file>Imagenes/arrow3.png</file>
         <file>Imagenes/arrow1.png</file>
         <file>Imagenes/arrow4.png</file>
+        <file>Imagenes/less.png</file>
+        <file>Imagenes/B1.png</file>
+        <file>Imagenes/B2.png</file>
+        <file>Imagenes/more.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

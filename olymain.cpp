@@ -13,8 +13,6 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     swarm_object                         = new swarm();
     messages_queue                       = new QQueue<QString>;
     show_comming_info                    = true;
-    sender_safe                          = true;
-    queue_safe                           = true;
     var                                  = "";
     joystick                             = NULL;
     botones[option_connect_disconnect]   = string("Conectar/Desconectar");
@@ -22,7 +20,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     botones[option_preferences]          = string("Preferencias");
     botones[option_about]                = string("Acerca de");
     botones[option_exit]                 = string("Salir");
-    checker                              = new verifyTime(terminal, swarm_object, &sender_safe, &queue_safe, sender, messages_queue, this);
+    checker                              = new verifyTime(terminal, swarm_object, sender, messages_queue, this);
     QGroupBox *board_container           = new QGroupBox("", this);
     QGroupBox *terminal_container        = new QGroupBox("", this);
     QGroupBox *options_container         = new QGroupBox("", this);
@@ -37,7 +35,6 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QHBoxLayout *more_options_layout     = new QHBoxLayout();
     QVBoxLayout *info_layout             = new QVBoxLayout();
     count_onoff                          = 0;
-
     etiqueta_info->setFont(QFont("Avec", 13, QFont::Normal));
     etiqueta_info->setAlignment(Qt::AlignCenter);
     etiqueta_info->setStyleSheet("QLabel {color : rgb(228, 241, 254); }");
@@ -205,7 +202,7 @@ bool olymain::openPreFile(){
         while(getline(pre, line)){
             if(line[0] == protocolo::delimitador_f){
                 QString nombre = QString::fromStdString(line.substr(5));
-                swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[3], messages_queue, &queue_safe, this));
+                swarm_object->getRobots()->push_back(new robot(nombre, line[1], line[3], messages_queue, this));
                 ui->robots_layout->addWidget(swarm_object->getRobots()->at(index++), x, y++);
                 if(y > 1){
                     y = 0;
@@ -292,7 +289,7 @@ void olymain::robotRutine(){
 }
 void olymain::begin(){
     rutine_robots = !rutine_robots;
-    checker->setSendEnable(rutine_robots);
+    protocolo::send_enabled = true;
     if(!count_onoff){
         timer.start(500);
         timer.moveToThread(&thread);
@@ -308,7 +305,7 @@ void olymain::begin(){
 }
 void olymain::stop(){
     rutine_robots = !rutine_robots;
-    checker->setSendEnable(rutine_robots);
+    protocolo::send_enabled = false;
     for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
        (*r)->getBotonControl()->setEnabled(false);
     swarm_object->closeControls();
@@ -323,8 +320,8 @@ void olymain::openAbout(){
                               "\nUniversidad Nacional Experimental del Táchira - Laboratorio de prototipos"));
 }
 void olymain::recieveInformation(){
-   if(sender_safe){
-       sender_safe = false;
+   if(protocolo::sender_safe){
+       protocolo::sender_safe = false;
        int index_1, index_2;
        QString robot_name;
        QString rec = "";
@@ -351,7 +348,7 @@ void olymain::recieveInformation(){
                    terminal->putData(QString("Error[3]: Mensaje: " + QString(rec) + QString::fromLatin1(" está dañado, no cumple con el protocolo\n")).toLatin1());
            }
        }
-       sender_safe = true;
+       protocolo::sender_safe = true;
    }
 }
 void olymain::closeEvent (QCloseEvent *event)
