@@ -53,6 +53,7 @@ public:
      *  y que se lo envie al comportamiento complejo definido aquí*/
 
     control_manual* getControl();
+    QToolButton* getBotonControl();
 
     ~robot();
 private slots:

@@ -62,6 +62,7 @@ protected:
 private:
     Ui::olymain               *ui;
     int                        num_robots;
+    int                        count_onoff; //Saber cuantas veces se ha encencido o apagado las rutinas
     bool                       manual_control;
     Console                   *board;
     Console                   *terminal;
@@ -80,6 +81,7 @@ private:
     //Variables para verificar que es seguro usar el objeto que envia y la cola de mensajes
     bool                       sender_safe;
     bool                       queue_safe;
+    bool                       send_enabled;
     bool                       serial_connection;
     bool                       rutine_robots;
     QString                    var;

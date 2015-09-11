@@ -79,7 +79,6 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
 }
 
 QString robot::getName(){
-    qDebug() << name;
     return name;
 }
 
@@ -89,7 +88,7 @@ char robot::getIdentificator(){
 void robot::operator<<(QString data){
     /*El operador se usa para procesar los mensajes que se van enviando*/
     if(data != old_m){
-        control_manual_boton->setEnabled(true);
+        //control_manual_boton->setEnabled(true);
         qDebug() << "Robot " << name << " procesando: " << data;
         old_m = data;
         /*El robot vuelve a verificar que la orden este bien*/
@@ -192,7 +191,7 @@ bool robot::setBehave(char behave, char opcion){
         messages_queue->enqueue(QString().fromStdString(message));
         *queue_safe = true;
     }else
-        qDebug() << "Error[6]: Ese comportamiento es incorrecto";
+        qDebug() << "Error[6.1]: Ese comportamiento es incorrecto";
     return retorno;
 }
 bool robot::setBehave(char behave){
@@ -205,12 +204,12 @@ bool robot::setBehave(char behave){
         message += protocolo::separador;
         message += behave;
         message += protocolo::delimitador_f;
-        qDebug() << QString::fromStdString(message);
+        //qDebug() << QString::fromStdString(message);
         *queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
         *queue_safe = true;
     }else
-        qDebug() << "Error[6]: Ese comportamiento es incorrecto";
+        qDebug() << "Error[6.2]: Ese comportamiento es incorrecto";
     return retorno;
 }
 
@@ -234,6 +233,9 @@ bool robot::explorar(){
 
 control_manual* robot::getControl(){
     return control;
+}
+QToolButton* robot::getBotonControl(){
+    return control_manual_boton;
 }
 
 robot::~robot(){

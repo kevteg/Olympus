@@ -36,6 +36,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QVBoxLayout *internal_options_layout = new QVBoxLayout();
     QHBoxLayout *more_options_layout     = new QHBoxLayout();
     QVBoxLayout *info_layout             = new QVBoxLayout();
+    count_onoff                          = 0;
 
     etiqueta_info->setFont(QFont("Avec", 13, QFont::Normal));
     etiqueta_info->setAlignment(Qt::AlignCenter);
@@ -91,7 +92,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
                     QGroupBox { margin-top: 7px; border: 0px \
                     solid black; border-radius: 3px; }");
 
-   options_container->setStyleSheet("QGroupBox{\
+    options_container->setStyleSheet("QGroupBox{\
                      background: rgb(58, 84, 88);  } \
                     QGroupBox::title{ subcontrol-origin: margin;\
                     subcontrol-position: top center;} \
@@ -277,30 +278,44 @@ void olymain::connection(){
 }
 void olymain::disconnection(){
     sender->breakConnection();
+    stop();
     /*Icono a conectar*/
     string dir = string(":/images/Imagenes/0.png");
     options[option_connect_disconnect]->setIcon(QIcon(QString::fromStdString(dir)));
     options[option_start_stop]->setEnabled(false);
 }
 void olymain::robotRutine(){
-    rutine_robots = !rutine_robots;
-    if(rutine_robots)
+    if(!rutine_robots)
         begin();
     else
         stop();
 }
 void olymain::begin(){
-    timer.start(500);
-    timer.moveToThread(&thread);
-    thread.start();
-    //thread.signal
+    rutine_robots = !rutine_robots;
+    checker->setSendEnable(rutine_robots);
+    if(!count_onoff){
+        timer.start(500);
+        timer.moveToThread(&thread);
+        thread.start();
+    }
+    for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
+        (*r)->getBotonControl()->setEnabled(true);
+
+    terminal->putData("Inicia rutina de robots\n");
     string dir = string(":/images/Imagenes/11.png");
     options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
+    count_onoff++;
 }
 void olymain::stop(){
-    //timer.stop();
+    rutine_robots = !rutine_robots;
+    checker->setSendEnable(rutine_robots);
+    for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
+       (*r)->getBotonControl()->setEnabled(false);
+    swarm_object->closeControls();
+    terminal->putData("Se pausa rutina de robots\n");
     string dir = string(":/images/Imagenes/1.png");
     options[option_start_stop]->setIcon(QIcon(QString::fromStdString(dir)));
+    count_onoff++;
 }
 void olymain::openAbout(){
     QMessageBox::about(this, tr("Acerca de Olympus 3"),
@@ -314,9 +329,7 @@ void olymain::recieveInformation(){
        QString robot_name;
        QString rec = "";
        QByteArray data = serial->readAll();
-
        var += data;
-       //qDebug() << var;
        if(var.contains(protocolo::delimitador_f, Qt::CaseInsensitive)){
             index_1 = var.size() - 1;
             while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_f)
@@ -326,8 +339,6 @@ void olymain::recieveInformation(){
             while(index_2 < var.size() && var.at(index_2) != protocolo::delimitador_i)
                 index_2++;
             rec = var.mid(index_2, (index_1 - index_2 + 1));
-
-            //qDebug() << "REC: " << rec;
             var = "";
        }
 
