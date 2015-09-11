@@ -56,8 +56,7 @@ public:
     };
     enum controladores_velocidad{
         sel_vel_1 = 0,
-        sel_vel_2 = 1,
-
+        sel_vel_2 = 1
     };
 
     enum joystick_c{

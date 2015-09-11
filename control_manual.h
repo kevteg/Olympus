@@ -18,8 +18,11 @@
 #include "protocolo.h"
 #include "qjoystickenumerator.h"
 
-#define n_buttons_sensors 2
-#define n_arrows 4
+#define n_buttons_options 3
+#define n_arrows          4
+#define OPC_ULTRA         0
+#define OPC_SEARCH        1
+#define OPC_INFRA         2
 
 using namespace std;
 class control_manual : public QMainWindow{
@@ -34,11 +37,13 @@ signals:
     void movement(char);
     void behave(char);
     void exc(int, bool);
+    void find();
 private slots:
     void updateAxis(int, short);
     void updateButton(int, bool);
     void buttonInfra();
     void buttonUltra();
+    void buttonSearch();
     void buttonUp();
     void buttonDown();
     void buttonRight();
@@ -48,11 +53,11 @@ protected:
      virtual void keyPressEvent(QKeyEvent *e);
 private:
     QToolButton     **arrows_buttons;
-    QToolButton     **sensors_buttons;
+    QToolButton     **options_buttons;
     QComboBox        *behaviors;
     QString          robot_name;
     QJoystick        *joystick;
-    bool             *sensors_data;
+    bool             *active_options;
 
 };
 

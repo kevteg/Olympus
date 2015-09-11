@@ -41,8 +41,7 @@ public:
     bool setBehave(char behave, char opcion);
 
     void setConnections();
-    /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
-    void find();
+
 
 
 
@@ -66,6 +65,8 @@ private slots:
     bool seguirInstrucciones(char opcion);
     bool seguirInstrucciones();
     bool explorar();
+    /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
+    void find();
 
 private:
     QVBoxLayout      *things_layout;

@@ -18,22 +18,23 @@ control_manual::control_manual(QString robot_name, QWidget *parent) : QMainWindo
     QVBoxLayout *arrows_layout_rl           = new QVBoxLayout();
     behaviors                               = new QComboBox(this);
     joystick                                = NULL;
-
-    sensors_data                            = new bool[n_buttons_sensors];
-    sensors_buttons                         = new QToolButton*[n_buttons_sensors];
+    active_options                            = new bool[n_buttons_options];
+    options_buttons                         = new QToolButton*[n_buttons_options];
+    arrows_buttons                          = new QToolButton*[n_arrows];
     behaviors->setWhatsThis("Cambiar comportamiento actual");
-    for (int index = 0; index < n_buttons_sensors; index++) {
-        sensors_data[index] = false;
-    }
 
-    for(index = 0; index < n_buttons_sensors; index++) {
+    for (int index = 0; index < n_buttons_options; index++)
+        active_options[index] = false;
+
+
+    for(index = 0; index < n_buttons_options; index++) {
         QChar img;
-        sensors_buttons[index] = new QToolButton(this);
-        sensors_buttons[index]->setIconSize(QSize(100, 100));
-        img = !index?'U':'I';
-        sensors_buttons[index]->setIcon(QIcon(":/images/Imagenes/" + QString(img) + "1.png"));
-        sensors_buttons[index]->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        sensors_buttons[index]->setStyleSheet("QToolButton {\
+        options_buttons[index] = new QToolButton(this);
+        options_buttons[index]->setIconSize(QSize(100, 100));
+        img = !index?'U':((index == 1)?'B':'I');
+        options_buttons[index]->setIcon(QIcon(":/images/Imagenes/" + QString(img) + "1.png"));
+        options_buttons[index]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        options_buttons[index]->setStyleSheet("QToolButton {\
                                                 background-color: rgb(51, 110, 123);\
                                                 border-radius: 50%;\
                                                 width:  70px;\
@@ -41,12 +42,12 @@ control_manual::control_manual(QString robot_name, QWidget *parent) : QMainWindo
                                                 position: centered;} \
                                                 QToolButton:pressed { \
                                                 background-color: rgb(67, 97, 102);}");
-        sensors_buttons[index]->setEnabled(false);
-        sensors_layout->addWidget(sensors_buttons[index]);
+        options_buttons[index]->setEnabled((!index || index == n_buttons_options - 1)?false:true);
+        sensors_layout->addWidget(options_buttons[index]);
     }
 
-    arrows_buttons = new QToolButton*[n_arrows];
-    for (index = 0; index < n_arrows; index++) {
+
+    for(index = 0; index < n_arrows; index++) {
         stringstream numero;
         numero << index + 1;
         arrows_buttons[index] = new QToolButton(this);
@@ -72,7 +73,7 @@ control_manual::control_manual(QString robot_name, QWidget *parent) : QMainWindo
         arrows_buttons[index]->setEnabled(false);
     }
     behave_layout->addWidget(behaviors);
-    //arrows_container->setFixedSize(100, 100);
+
     arrows_container->setStyleSheet("QGroupBox {\
                                      background: rgb(255, 255, 255); \
                                      border-radius: 90%;\
@@ -86,9 +87,9 @@ control_manual::control_manual(QString robot_name, QWidget *parent) : QMainWindo
     behave_container->setStyleSheet("QGroupBox {\
                                      background: rgb(92, 151, 191); }");
     index = 0;
-    for (char com = 'A'; index < protocolo::total_comportamientos; com++, index++) {
+    for (char com = 'A'; index < protocolo::total_comportamientos; com++, index++)
         behaviors->addItem(protocolo::getCadenaInstruccion(com), (com == 'D')?'!':com);
-    }
+
     arrows_container->setLayout(arrows_layout);
     sensors_container->setLayout(sensors_layout);
     behave_container->setLayout(behave_layout);
@@ -108,8 +109,9 @@ void control_manual::connect_joy(QJoystick *joystick){
     connect(this->joystick, SIGNAL(buttonChanged(int,bool)), this, SLOT(updateButton(int,bool)));
 }
 void control_manual::setConnections(){
-    connect(sensors_buttons[protocolo::sensor_distancia], SIGNAL(clicked()), this, SLOT(buttonUltra()));
-    connect(sensors_buttons[protocolo::sensor_infrarojo], SIGNAL(clicked()), this, SLOT(buttonInfra()));
+    connect(options_buttons[OPC_ULTRA], SIGNAL(clicked()), this, SLOT(buttonUltra()));
+    connect(options_buttons[OPC_SEARCH], SIGNAL(clicked()), this, SLOT(buttonSearch()));
+    connect(options_buttons[OPC_INFRA], SIGNAL(clicked()), this, SLOT(buttonInfra()));
     connect(arrows_buttons[protocolo::up], SIGNAL(clicked()), this, SLOT(buttonUp()));
     connect(arrows_buttons[protocolo::down], SIGNAL(clicked()), this, SLOT(buttonDown()));
     connect(arrows_buttons[protocolo::right], SIGNAL(clicked()), this, SLOT(buttonRight()));
@@ -138,26 +140,28 @@ void control_manual::buttonLeft(){
 }
 
 void control_manual::buttonInfra(){
-    sensors_data[protocolo::sensor_infrarojo] = !sensors_data[protocolo::sensor_infrarojo];
-    char img = !sensors_data[protocolo::sensor_infrarojo]?'1':'2';
-    qDebug() << ":/images/Imagenes/I" + QString(img) + ".png";
-    sensors_buttons[protocolo::sensor_infrarojo]->setIcon(QIcon(":/images/Imagenes/I" + QString(img) + ".png"));
-    qDebug() << "Infrarrojo";
-    emit exc(protocolo::sensor_infrarojo, sensors_data[protocolo::sensor_infrarojo]);
+    active_options[OPC_INFRA] = !active_options[OPC_INFRA];
+    char img = !active_options[OPC_INFRA]?'1':'2';
+    options_buttons[OPC_INFRA]->setIcon(QIcon(":/images/Imagenes/I" + QString(img) + ".png"));
+    emit exc(protocolo::sensor_infrarojo, active_options[OPC_INFRA]);
 }
 
 void control_manual::buttonUltra(){
-    sensors_data[protocolo::sensor_distancia] = !sensors_data[protocolo::sensor_distancia];
-    char img = !sensors_data[protocolo::sensor_distancia]?'1':'2';
-    qDebug() << ":/images/Imagenes/U" + QString(img) + ".png";
-    sensors_buttons[protocolo::sensor_distancia]->setIcon(QIcon(":/images/Imagenes/U" + QString(img) + ".png"));
-    qDebug() << "Ultrasonido";
-    emit exc(protocolo::sensor_distancia, sensors_data[protocolo::sensor_distancia]);
+    active_options[OPC_ULTRA] = !active_options[OPC_ULTRA];
+    char img = !active_options[OPC_ULTRA]?'1':'2';
+    options_buttons[OPC_ULTRA]->setIcon(QIcon(":/images/Imagenes/U" + QString(img) + ".png"));
+    emit exc(protocolo::sensor_distancia, active_options[OPC_ULTRA]);
+}
+void control_manual::buttonSearch(){
+    active_options[OPC_SEARCH] = !active_options[OPC_SEARCH];
+    char img = !active_options[OPC_SEARCH]?'1':'2';
+    options_buttons[OPC_SEARCH]->setIcon(QIcon(":/images/Imagenes/B" + QString(img) + ".png"));
+    emit find();
 }
 void control_manual::changeBehave(){
     QChar comportamiento = behaviors->currentData().toChar();
-    for (int index = 0; index < n_buttons_sensors; index++)
-        sensors_buttons[index]->setEnabled((comportamiento.toLatin1() == protocolo::Seguir_instruccion)?true:false);
+    for (int index = 0; index < n_buttons_options; index++)
+        options_buttons[index]->setEnabled((comportamiento.toLatin1() == protocolo::Seguir_instruccion || index == OPC_SEARCH)?true:false);
     for (int index = 0; index < n_arrows; index++)
         arrows_buttons[index]->setEnabled((comportamiento.toLatin1() == protocolo::Seguir_instruccion)?true:false);
     qDebug() << comportamiento;
@@ -205,10 +209,10 @@ void control_manual::updateButton(int n, bool v){
                 behaviors->setCurrentIndex(behaviors->findData(protocolo::Detener));
             break;
             case 4:
-                sensors_buttons[protocolo::sensor_distancia]->animateClick();
+                options_buttons[OPC_ULTRA]->animateClick();
             break;
             case 5:                
-                sensors_buttons[protocolo::sensor_infrarojo]->animateClick();
+                options_buttons[OPC_INFRA]->animateClick();
             break;
             case 6:
 
@@ -240,10 +244,10 @@ void control_manual::keyPressEvent(QKeyEvent *e){
             arrows_buttons[protocolo::left]->animateClick();
         break;
         case Qt::Key_I:
-            sensors_buttons[protocolo::sensor_infrarojo]->animateClick();
+            options_buttons[OPC_INFRA]->animateClick();
         break;
         case Qt::Key_U:
-            sensors_buttons[protocolo::sensor_distancia]->animateClick();
+            options_buttons[OPC_ULTRA]->animateClick();
         break;
         case Qt::Key_Tab:
             behaviors->setFocusPolicy(Qt::NoFocus);

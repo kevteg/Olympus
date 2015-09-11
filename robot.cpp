@@ -126,7 +126,6 @@ void robot::operator<<(QString data){
                 if(data.size() > 7){
                     exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
                     sensors[data.at(5).toLatin1() - '0']->setStyleSheet(!(data.at(7).toLatin1() - '0')?GRIS:ROJO);
-                    //sensors[data.at(5).toLatin1() - '0']->setChecked(exceptions[data.at(5).toLatin1() - '0']);
                     board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
                 }
             break;
@@ -142,6 +141,7 @@ void robot::setConnections(){
     connect(control, SIGNAL(movement(char)), this, SLOT(seguirInstrucciones(char)));
     connect(control, SIGNAL(exc(int, bool)), this, SLOT(setException(int, bool)));
     connect(control, SIGNAL(behave(char)), this, SLOT(setBehave(char)));
+    connect(control, SIGNAL(find()), this, SLOT(find()));
 }
 
 bool robot::getException(int exception_tipe){
@@ -227,6 +227,19 @@ bool robot::seguirInstrucciones(){
 }
 bool robot::explorar(){
     return setBehave(protocolo::Explorar);
+}
+
+void robot::find(){
+    string message;
+    message = protocolo::delimitador_i;
+    message += this->identificator;
+    message += protocolo::separador;
+    message += protocolo::buscar;
+    message += protocolo::delimitador_f;
+    qDebug() << QString().fromStdString(message);
+    protocolo::queue_safe = false;
+    messages_queue->enqueue(QString().fromStdString(message));
+    protocolo::queue_safe = true;
 }
 
 control_manual* robot::getControl(){
