@@ -46,7 +46,7 @@ public:
 
 
     bool cambiarVelocidad(int nueva_velocidad);
-
+    int calculateSpeed(int, int);
     /*Comportamientos complejos*/
     /*Crear como un hilo que verifique como cambia el estado del robot
      *  y que se lo envie al comportamiento complejo definido aquí*/
@@ -67,6 +67,8 @@ private slots:
     bool explorar();
     /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
     void find();
+    void setSpeed(int, int);
+    void showControl();
 
 private:
     QVBoxLayout      *things_layout;
@@ -85,6 +87,7 @@ private:
     char             *behave;
     bool             *exceptions;
     control_manual   *control;
+    int               speed;
 };
 
 #endif // ROBOT_H

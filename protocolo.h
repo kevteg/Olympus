@@ -32,7 +32,8 @@ public:
         Busqueda_tipo       = 1,
         Excepcion_tipo      = 2,
         Caracteres_tipo     = 3,
-        opcion_cmp_tipo     = 4
+        opcion_cmp_tipo     = 4,
+        Velocidad_tipo      = 5
     };
     enum robot_defecto{
         todos_robots = 'X'
@@ -55,9 +56,16 @@ public:
         numero_excepciones = 2
     };
     enum controladores_velocidad{
-        sel_vel_1 = 0,
-        sel_vel_2 = 1,
-
+        var_vel_1     = 0,
+        var_vel_2     = 1,
+        vel_variables = 2,
+        sel_vel_1     = 0,
+        sel_vel_2     = 1,
+        max_vel       = 9,
+        min_vel       = 0,
+        max_vel_real  = 245,
+        min_vel_real  = 55,
+        default_speed = 105
     };
 
     enum joystick_c{
@@ -114,6 +122,8 @@ public:
             case excepcion:
                 return Excepcion_tipo;
             break;
+            case velocidad:
+                return Velocidad_tipo;
             break;
             case delimitador_i :
             case delimitador_f:

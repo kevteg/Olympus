@@ -2,6 +2,7 @@
 /*TODO: Una guía del protocolo*/
 robot::robot(QString name, char identificator, char default_behave, QQueue<QString>* messages_queue, QWidget *parent) : QGroupBox("", parent){
     QFont f( "Adec", 14, QFont::Normal);
+    speed                                   = protocolo::default_speed;
     this->name                              = name;
     board                                   = new Console(Qt::white, Qt::black, "> ", false, this);
     robot_nombre                            = new QLabel(this);
@@ -20,7 +21,7 @@ robot::robot(QString name, char identificator, char default_behave, QQueue<QStri
     exceptions                              = new bool[protocolo::numero_excepciones];
     exceptions[protocolo::sensor_distancia] = false;
     exceptions[protocolo::sensor_infrarojo] = false;
-    control                                 = new control_manual(name);
+    control                                 = new control_manual(name, speed);
     control_manual_boton->setEnabled(false);
 
     this->setStyleSheet("QGroupBox{ background: rgb(27, 188, 155);} ");
@@ -120,13 +121,27 @@ void robot::operator<<(QString data){
             break;
             case protocolo::Busqueda_tipo:
                 /*Podría ser que se guarde si se habia buscado*/
-                board->putData(QString("Buscando...\n").toLatin1());
+                if(data.at(4).toLatin1() != protocolo::delimitador_f){
+                    board->putData(QString("Robot responde a busqueda:\n Comportamiento: "+ QString(protocolo::getCadenaInstruccion(data.at(5).toLatin1())).toLatin1() + "\n").toLatin1());
+                    if(data.size() >= 7)
+                        board->putData(QString("Dirección: "+ QString(protocolo::getCadenaInstruccion(data.at(7).toLatin1())).toLatin1()).toLatin1());
+                }else
+                    board->putData(QString("Buscando...\n").toLatin1());
             break;
             case protocolo::Excepcion_tipo:
                 if(data.size() > 7){
                     exceptions[data.at(5).toLatin1() - '0'] = data.at(7).toLatin1() - '0';
                     sensors[data.at(5).toLatin1() - '0']->setStyleSheet(!(data.at(7).toLatin1() - '0')?GRIS:ROJO);
                     board->putData(QString(QString::fromLatin1("Excepción sensor ") + QString((!(data.at(5).toLatin1() - '0'))?"distancia":"infrarojo") + QString(exceptions[data.at(5).toLatin1() - '0']?" Activada":" Desactivada") + "\n").toLatin1());
+                }
+            break;
+            case protocolo::Velocidad_tipo:
+                if(data.size() > 7 && ((data.at(5).toLatin1() - 48) == protocolo::sel_vel_1 ||
+                                       (data.at(5).toLatin1() - 48) == protocolo::sel_vel_2)
+                        && (data.at(7).toLatin1() - 48) >= protocolo::min_vel && (data.at(7).toLatin1() - 48) <= protocolo::max_vel){
+
+                    speed = calculateSpeed((data.at(5).toLatin1() - 48), (data.at(7).toLatin1() - 48));
+                    board->putData(QString("Velocidad del robot: " + QString::number(speed) + "\n").toLatin1());
                 }
             break;
             }
@@ -137,11 +152,12 @@ void robot::operator<<(QString data){
         qDebug() << "Mensaje ya procesado: " << data;
 }
 void robot::setConnections(){
-    connect(control_manual_boton, SIGNAL(clicked()), control, SLOT(show()));
+    connect(control_manual_boton, SIGNAL(clicked()), this, SLOT(showControl()));
     connect(control, SIGNAL(movement(char)), this, SLOT(seguirInstrucciones(char)));
     connect(control, SIGNAL(exc(int, bool)), this, SLOT(setException(int, bool)));
     connect(control, SIGNAL(behave(char)), this, SLOT(setBehave(char)));
     connect(control, SIGNAL(find()), this, SLOT(find()));
+    connect(control, SIGNAL(newVel(int,int)), this, SLOT(setSpeed(int, int)));
 }
 
 bool robot::getException(int exception_tipe){
@@ -202,7 +218,6 @@ bool robot::setBehave(char behave){
         message += protocolo::separador;
         message += behave;
         message += protocolo::delimitador_f;
-        //qDebug() << QString::fromStdString(message);
         protocolo::queue_safe = false;
         messages_queue->enqueue(QString().fromStdString(message));
         protocolo::queue_safe = true;
@@ -247,6 +262,31 @@ control_manual* robot::getControl(){
 }
 QToolButton* robot::getBotonControl(){
     return control_manual_boton;
+}
+void robot::setSpeed(int x, int y){
+    string message;
+    if((x == protocolo::sel_vel_1 || x == protocolo::sel_vel_2) && y >= protocolo::min_vel && y <= protocolo::max_vel){
+        message = protocolo::delimitador_i;
+        message += this->identificator;
+        message += protocolo::separador;
+        message += protocolo::velocidad;
+        message += protocolo::separador;
+        message += x + 48;
+        message += protocolo::separador;
+        message += y + 48;
+        message += protocolo::delimitador_f;
+        qDebug() << QString().fromStdString(message);
+        protocolo::queue_safe = false;
+        messages_queue->enqueue(QString().fromStdString(message));
+        protocolo::queue_safe = true;
+    }
+}
+int robot::calculateSpeed(int x, int y){
+    return protocolo::min_vel_real + (y + x*10)*10;
+}
+void robot::showControl(){
+    control->setCurr_robot_vel(speed);
+    control->show();
 }
 
 robot::~robot(){

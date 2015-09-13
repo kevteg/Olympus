@@ -25,7 +25,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     QGroupBox *terminal_container        = new QGroupBox("", this);
     QGroupBox *options_container         = new QGroupBox("", this);
     QGroupBox *info_container            = new QGroupBox("", this);
-    serial_connection                    = false;
+    serial_connection                    = true;
     rutine_robots                        = false;
     cant_robots                          = new QLabel();
     QLabel *etiqueta_info                = new QLabel("CANTIDAD DE ROBOTS\nCONECTADOS");
@@ -253,13 +253,13 @@ void olymain::change_info(preferencias::preferencia set){
 }
 
 void olymain::connect_serial(){
-    serial_connection = !serial_connection;
     if(serial_connection){
         connection();
     }else
         disconnection();
 }
 void olymain::connection(){
+    serial_connection = true;
      opt = settings->Preferencia();
     if(sender->createConnection(opt)){
         /*Cambiar al icono de desconeccion*/
@@ -268,12 +268,13 @@ void olymain::connection(){
         options[option_start_stop]->setEnabled(true);
         ui->statusBar->showMessage(tr("Conectado correctamente a: %1 : %2").arg(opt.nombre).arg(opt.stringBaudRate));
     }else{
-        terminal->putData(QString("Error[2]: Problemas con el puerto").toLatin1());
+        terminal->putData(QString("Error[2]: Problemas con el puerto\n").toLatin1());
         QMessageBox::critical(this, tr("Error con el puerto seleccionado"), serial->errorString());
         ui->statusBar->showMessage(tr("Error al abrir serial"));
     }
 }
 void olymain::disconnection(){
+    serial_connection = false;
     sender->breakConnection();
     stop();
     /*Icono a conectar*/
@@ -288,7 +289,7 @@ void olymain::robotRutine(){
         stop();
 }
 void olymain::begin(){
-    rutine_robots = !rutine_robots;
+    rutine_robots = true;
     protocolo::send_enabled = true;
     if(!count_onoff){
         timer.start(500);
@@ -304,7 +305,7 @@ void olymain::begin(){
     count_onoff++;
 }
 void olymain::stop(){
-    rutine_robots = !rutine_robots;
+    rutine_robots = false;
     protocolo::send_enabled = false;
     for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
        (*r)->getBotonControl()->setEnabled(false);
