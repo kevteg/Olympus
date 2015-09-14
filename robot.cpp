@@ -122,8 +122,8 @@ void robot::operator<<(QString data){
             case protocolo::Busqueda_tipo:
                 /*Podría ser que se guarde si se habia buscado*/
                 if(data.at(4).toLatin1() != protocolo::delimitador_f){
-                    board->putData(QString("Robot responde a busqueda:\n Comportamiento: "+ QString(protocolo::getCadenaInstruccion(data.at(5).toLatin1())).toLatin1() + "\n").toLatin1());
-                    if(data.size() >= 7)
+                    board->putData(QString("Robot envia:\n Comportamiento: "+ QString(protocolo::getCadenaInstruccion(data.at(5).toLatin1())).toLatin1() + "\n").toLatin1());
+                    if(data.size() > 7)
                         board->putData(QString("Dirección: "+ QString(protocolo::getCadenaInstruccion(data.at(7).toLatin1())).toLatin1()).toLatin1());
                 }else
                     board->putData(QString("Buscando...\n").toLatin1());
