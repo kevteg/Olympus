@@ -5,12 +5,9 @@ swarm::swarm(){
 }
 
 swarm::~swarm(){
-
     for(vector<robot*>::iterator r =  robots->begin(); r != robots->end(); ++r)
         delete *r;
-
     delete robots;
-
 }
 vector<robot*> *swarm::getRobots(){
     return robots;

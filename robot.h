@@ -37,13 +37,9 @@ public:
     void operator<<(QString data);
 
 
-    /*Se cambia el comportamiento actual, NOTA: si es alguno de los comportamientos definidos en seguir instrucciones el comportamiento cambia automaticamente*/
-    bool setBehave(char behave, char opcion);
+
 
     void setConnections();
-
-
-
 
     bool cambiarVelocidad(int nueva_velocidad);
     int calculateSpeed(int, int);
@@ -59,6 +55,8 @@ private slots:
     /*Si la pudo cambiar retorna true, si no esta en el modo correcto o hay algo mal con exception_type retornará false*/
     bool setException(int exception_type, bool option);
     bool setBehave(char behave);
+    /*Se cambia el comportamiento actual, NOTA: si es alguno de los comportamientos definidos en seguir instrucciones el comportamiento cambia automaticamente*/
+    bool setBehave(char behave, char opcion);
     /*Comportamientos básicos*/
     bool evadir();
     bool detener();
@@ -68,8 +66,12 @@ private slots:
     /*TODO: Para buscar el robot levantar un emit aqui cuando responda*/
     void find();
     void setSpeed(int, int);
+    void setSpeed(int);
     void showControl();
-
+protected:
+    /*Estas funciones cambian el comportamiento del robot. No lo envian a ser revisadas*/
+    void setBehave_(char);
+    void setBehave_(char, char);
 private:
     QVBoxLayout      *things_layout;
     QHBoxLayout      *half_layout;

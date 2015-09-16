@@ -94,37 +94,21 @@ void robot::operator<<(QString data){
         if(protocolo::verificacion(data.toLatin1(), 0) && data.at(1) == this->identificator){
             switch (protocolo::getTipoInstruccion(data.at(3).toLatin1())) {
             case protocolo::Comportamiento_tipo:
-                if(behave[_main] != data.at(3).toLatin1()){
-                    behave[_main] = data.at(3).toLatin1();
-                    actual_behavior->setText(protocolo::getCadenaInstruccion(data.at(3).toLatin1()).toUpper());
-                    if(actual_behavior->text().count() > 10){
-                        QFont fuente("Adec", 10, QFont::Normal);
-                        actual_behavior->setFont(fuente);
-                    }else{
-                        QFont fuente("Adec", 14, QFont::Normal);
-                        actual_behavior->setFont(fuente);
-                    }
-
-                    board->putData(QString("Nuevo comportamiento definido: " + protocolo::getCadenaInstruccion(data.at(3).toLatin1()) + "\n").toLatin1());
-                }
-                if(data.size() > protocolo::tam_min){
-                    if(behave[secondary] != data.at(5).toLatin1()){
-                        behave[secondary] = data.at(5).toLatin1();
-                        board->putData(QString(QString::fromLatin1("Nueva dirección: ") + protocolo::getCadenaInstruccion(data.at(5).toLatin1()) + "\n").toLatin1());
-                    }
-                }else
-                    behave[secondary] = none;
-                if(data.at(3).toLatin1() == protocolo::Detener)
-                    actual_behavior->setStyleSheet(ROJO);
+                if(!(data.size() > protocolo::tam_min))
+                    setBehave_(data.at(3).toLatin1());
                 else
-                    actual_behavior->setStyleSheet(BLANCO);
+                    setBehave_(data.at(3).toLatin1(), data.at(5).toLatin1());
             break;
             case protocolo::Busqueda_tipo:
                 /*Podría ser que se guarde si se habia buscado*/
-                if(data.at(4).toLatin1() != protocolo::delimitador_f){
-                    board->putData(QString("Robot envia:\n Comportamiento: "+ QString(protocolo::getCadenaInstruccion(data.at(5).toLatin1())).toLatin1() + "\n").toLatin1());
-                    if(data.size() > 7)
-                        board->putData(QString("Dirección: "+ QString(protocolo::getCadenaInstruccion(data.at(7).toLatin1())).toLatin1()).toLatin1());
+                if(data.size() > protocolo::tam_min){
+                    board->putData(QString("Robot envia:\n").toLatin1());
+
+                    if(!(data.size() > 7)) //Si es mayor que siete significa que el robot responde el comportamiento más su opción
+                        setBehave_(data.at(5).toLatin1());
+                    else
+                        setBehave_(data.at(5).toLatin1(), data.at(7).toLatin1());
+
                 }else
                     board->putData(QString("Buscando...\n").toLatin1());
             break;
@@ -284,6 +268,42 @@ void robot::setSpeed(int x, int y){
 int robot::calculateSpeed(int x, int y){
     return protocolo::min_vel_real + (y + x*10)*10;
 }
+void robot::setSpeed(int speed){
+    int x, y;
+    x = (speed > (protocolo::min_vel_real + protocolo::max_vel_real)/2)?protocolo::sel_vel_2:protocolo::sel_vel_1;
+    y = ((speed - protocolo::min_vel_real)/10) - x*10;
+    setSpeed(x, y);
+}
+void robot::setBehave_(char behave){
+    if(this->behave[_main] != behave){
+        this->behave[_main] = behave;
+        actual_behavior->setText(protocolo::getCadenaInstruccion(behave).toUpper());
+        if(actual_behavior->text().count() > 10){
+            QFont fuente("Adec", 10, QFont::Normal);
+            actual_behavior->setFont(fuente);
+        }else{
+            QFont fuente("Adec", 14, QFont::Normal);
+            actual_behavior->setFont(fuente);
+        }
+
+        board->putData(QString("Comportamiento actual: " + protocolo::getCadenaInstruccion(behave) + "\n").toLatin1());
+    }
+    this->behave[secondary] = none;
+    if(this->behave[_main] == protocolo::Detener)
+        actual_behavior->setStyleSheet(ROJO);
+    else
+        actual_behavior->setStyleSheet(BLANCO);
+}
+
+void robot::setBehave_(char behave, char option){
+    setBehave_(behave);
+    if(this->behave[secondary] != option){
+        this->behave[secondary] = option;
+        if(this->behave[secondary] == protocolo::opcion_cmp_tipo)
+            board->putData(QString(QString::fromLatin1("Dirección: ") + protocolo::getCadenaInstruccion(option) + "\n").toLatin1());
+    }
+}
+
 void robot::showControl(){
     control->setCurr_robot_vel(speed);
     control->show();
