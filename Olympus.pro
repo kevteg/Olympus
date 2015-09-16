@@ -25,10 +25,10 @@ SOURCES += main.cpp      \
         console.cpp      \
         messenger.cpp \
     verifytime.cpp \
-    swarm.cpp \
     control_manual.cpp \
     qjoystick.cpp \
-    qjoystickenumerator.cpp
+    qjoystickenumerator.cpp \
+    swarm.cpp
 
 HEADERS  += olymain.h      \
             robot.h        \
@@ -37,10 +37,10 @@ HEADERS  += olymain.h      \
             protocolo.h    \
             messenger.h \
     verifytime.h \
-    swarm.h \
     control_manual.h \
     qjoystick.h \
-    qjoystickenumerator.h
+    qjoystickenumerator.h \
+    swarm.h
 
 FORMS    += olymain.ui  \
             preferencias.ui \ 

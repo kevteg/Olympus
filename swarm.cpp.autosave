@@ -22,7 +22,6 @@ void swarm::rutine(){
         if(robots->at(1)->getException(protocolo::sensor_distancia))
             robots->at(1)->evadir();
 
-
     }else
         qDebug() << "Pausa de rutinas";
 }

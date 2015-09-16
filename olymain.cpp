@@ -128,7 +128,7 @@ olymain::olymain(QWidget *parent) : QMainWindow(parent), ui(new Ui::olymain){
     opciones_titulos[1]->setText("CONEXIÓN SERIAL");
     opciones_titulos[2]->setText("RUTINAS DE ROBOTS");
 
-    qDebug() << "Hilo principal: " << QThread::currentThreadId();
+    qDebug() << "Hilo principal: " << QThread::currentThread();
 
     ui->robots_layout->setSpacing(15);
     if(!openPreFile()){
@@ -224,9 +224,12 @@ void olymain::defaultSituation(){
     terminal->putData("Bienvenido a Olympus\n");
 }
 void olymain::setConections(){
-    /*Hilo*/
-    connect(&timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
-    connect(&thread, SIGNAL(finished()), &timer, SLOT(stop()));
+    /*Hilo de envio*/
+    connect(&sender_timer, SIGNAL(timeout()), checker, SLOT(onTimeout()));
+    connect(&sender_thread, SIGNAL(finished()), &sender_timer, SLOT(stop()));
+    /*Hilo de rutinas compartidas de robots*/
+    connect(&rutine_timer, SIGNAL(timeout()), swarm_object, SLOT(rutine()));
+    connect(&rutine_thread, SIGNAL(finished()), &rutine_timer, SLOT(stop()));
     /*Opciones*/
     connect(options[option_exit], SIGNAL(clicked()), this, SLOT(close()));
     connect(options[option_connect_disconnect], SIGNAL(clicked()), this, SLOT(connect_serial()));
@@ -239,7 +242,6 @@ void olymain::setConections(){
     connect(terminal, SIGNAL(showAbout()), this, SLOT(openAbout()));
     connect(terminal, SIGNAL(changeMstate()), this, SLOT(changeMessState()));
     connect(terminal, SIGNAL(exitProgram()), this, SLOT(close()));
-
 }
 void olymain::changeMessState(){
     show_comming_info = !show_comming_info;
@@ -289,12 +291,15 @@ void olymain::robotRutine(){
         stop();
 }
 void olymain::begin(){
-    rutine_robots = true;
+    rutine_robots           = true;
     protocolo::send_enabled = true;
     if(!count_onoff){
-        timer.start(500);
-        timer.moveToThread(&thread);
-        thread.start();
+        sender_timer.start(250);
+        sender_timer.moveToThread(&sender_thread);
+        sender_thread.start();
+        rutine_timer.start(500);
+        rutine_timer.moveToThread(&rutine_thread);
+        rutine_thread.start();
     }
     for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
         (*r)->getBotonControl()->setEnabled(true);
@@ -305,7 +310,7 @@ void olymain::begin(){
     count_onoff++;
 }
 void olymain::stop(){
-    rutine_robots = false;
+    rutine_robots           = false;
     protocolo::send_enabled = false;
     for(vector<robot*>::iterator r =  swarm_object->getRobots()->begin(); r != swarm_object->getRobots()->end(); ++r)
        (*r)->getBotonControl()->setEnabled(false);
@@ -332,7 +337,6 @@ void olymain::recieveInformation(){
             index_1 = var.size() - 1;
             while(index_1 > 0 && var.at(index_1) != protocolo::delimitador_f)
                 index_1--;
-
             index_2 = 0;
             while(index_2 < var.size() && var.at(index_2) != protocolo::delimitador_i)
                 index_2++;
@@ -366,7 +370,8 @@ void olymain::closeEvent (QCloseEvent *event)
     }
 }
 olymain::~olymain(){
-    thread.quit();
+    sender_thread.quit();
+    rutine_thread.quit();
     delete ui;
     delete board;
     delete terminal;

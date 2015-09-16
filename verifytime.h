@@ -2,13 +2,11 @@
 #define VERIFYTIME_H
 
 #include <QtCore>
-//#include "protocolo.h"
 #include "messenger.h"
 #include "swarm.h"
 
 //Esta clase se usa para verificar los envios
-class verifyTime : public QObject
-{
+class verifyTime : public QObject{
     Q_OBJECT
 public:
     explicit verifyTime(Console *terminal, swarm *swarm_object, messenger *sender, QQueue<QString>* messages_queue, QObject *parent = 0);

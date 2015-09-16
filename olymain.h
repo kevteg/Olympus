@@ -68,8 +68,10 @@ private:
     preferencias              *settings;
     preferencias::preferencia  opt;
     QQueue<QString>           *messages_queue;
-    QThread                    thread;
-    QTimer                     timer;
+    QThread                    sender_thread;
+    QThread                    rutine_thread;
+    QTimer                     sender_timer;
+    QTimer                     rutine_timer;
     verifyTime                *checker;
     swarm                     *swarm_object;
     QJoystick                 *joystick;

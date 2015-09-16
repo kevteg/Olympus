@@ -1,4 +1,4 @@
-#include "swarm.h"
+#include "swarmi.h"
 
 swarm::swarm(QObject *parent) : QObject(parent){
     robots = new vector <robot*>;
@@ -19,9 +19,6 @@ void swarm::closeControls(){
 void swarm::rutine(){
     /*Sí está habilitado enviar es porque está activo las rutinas de los robots*/
     if(protocolo::send_enabled){
-        if(robots->at(1)->getException(protocolo::sensor_distancia))
-            robots->at(1)->evadir();
-
 
     }else
         qDebug() << "Pausa de rutinas";

@@ -51,7 +51,7 @@ public:
     QToolButton* getBotonControl();
 
     ~robot();
-private slots:
+public slots:
     /*Si la pudo cambiar retorna true, si no esta en el modo correcto o hay algo mal con exception_type retornará false*/
     bool setException(int exception_type, bool option);
     bool setBehave(char behave);

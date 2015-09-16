@@ -263,11 +263,10 @@ void control_manual::updateButton(int n, bool v){
                 options_buttons[OPC_INFRA]->animateClick();
             break;
             case 6:
-
+                lessButton();
             break;
-
             case 7:
-
+                moreButton();
             break;
         }
 }
