@@ -19,10 +19,16 @@ void swarm::closeControls(){
 void swarm::rutine(){
     /*Sí está habilitado enviar es porque está activo las rutinas de los robots*/
     if(protocolo::send_enabled){
-        if(robots->at(1)->getException(protocolo::sensor_distancia))
-            robots->at(1)->evadir();
 
+        if(robots->at(1)->getException(protocolo::sensor_distancia) && !robots->at(0)->getException(protocolo::sensor_distancia)){
+            robots->at(1)->detener();
+            robots->at(0)->seguirInstrucciones(protocolo::derecha);
+        }
 
+        if(robots->at(0)->getException(protocolo::sensor_distancia) && !robots->at(1)->getException(protocolo::sensor_distancia)){
+            robots->at(0)->detener();
+            robots->at(1)->seguirInstrucciones(protocolo::izquierda);
+        }
     }else
         qDebug() << "Pausa de rutinas";
 }
